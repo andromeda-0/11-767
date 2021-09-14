@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9f54a0e6-0c16-4782-882c-850446e48bd4" name="zongyuez@triplefighting.wifi.local.cmu.edu">
+        <fileTransfer rootFolder="/home/zongyuez" accessType="SFTP" host="triplefighting.wifi.local.cmu.edu" port="22" sshConfigId="68e9cef2-cbd6-454d-bcd7-c6ec0f09485f" sshConfig="zongyuez@triplefighting.wifi.local.cmu.edu:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

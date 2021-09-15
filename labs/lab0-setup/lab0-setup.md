@@ -11,14 +11,18 @@ Group members present in lab today: Junli Cao, Songhao Jia, Zongyue Zhao.
 1: Set up your device.
 ----
 Depending on your hardware, follow the instructions provided in this directory: [Raspberry Pi 4](https://github.com/strubell/11-767/blob/main/labs/lab0-setup/setup-rpi4.md), [Jetson Nano](https://github.com/strubell/11-767/blob/main/labs/lab0-setup/setup-jetson.md), [Google Coral](https://coral.ai/docs/dev-board/get-started/). 
-1. What device(s) are you setting up? Jetson Nano 2GB.
+1. What device(s) are you setting up? 
+  a. Jetson Nano 2GB.
 3. Did you run into any roadblocks following the instructions? What happened, and what did you do to fix the problem?
-4. Are all group members now able to ssh in to the device from their laptops? If not, why not? How will this be resolved?
+  a. We could not find the `/boot/firmware` folder. Solution: manually creating the folder and the corresponding config file. (No longer needed).
+  b. `python3 capture_audio.py` generates wav file with no content. Debug process: ensure input device is set correctly (USB), check numpy array 
+3. Are all group members now able to ssh in to the device from their laptops? If not, why not? How will this be resolved?
+ a. Yes.
 
 2: Collaboration / hardware management plan
 ----
 4. What is your group's hardware management plan? For example: Where will the device(s) be stored throughout the semester? What will happen if a device needs physical restart or debugging? What will happen in the case of COVID lockdown?
-
+  a. Our group has purchased an extra Jetson Nano 2GB, which is now stored in Professor Strubell's office. All group members has ssh access to it, and we will contact Prof. Strubell for rebooting if needed. In case of a COVID lockdown, we will use the other Jetson board.
 
 3: Putting it all together
 ----

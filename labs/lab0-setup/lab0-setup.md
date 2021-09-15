@@ -4,9 +4,9 @@ The goal of this lab is for you to become more familiar with the hardware platfo
 
 If you successfully complete all those tasks, then your final task is to write a script that pipes together I/O with a model. For example, you could write a script that uses the camera to capture an image, then runs classification on that image. Or you could capture audio, run speech-to-text, then run sentiment analysis on that text.
 
-Group name:
+Group name: tripleFighting
 ---
-Group members present in lab today: Junli Cao, Songhao Jia, Zongyue Zhao.
+Group members present in lab today: Jiajun Bao, Songhao Jia, Zongyue Zhao.
 
 1: Set up your device.
 ----

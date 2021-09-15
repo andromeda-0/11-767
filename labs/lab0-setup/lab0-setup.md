@@ -24,5 +24,7 @@ Depending on your hardware, follow the instructions provided in this directory: 
 ----
 5. Now, you should be able to take a picture, record audio, run a basic computer vision model, and run a basic NLP model. Now, write a script that pipes I/O to models. For example, write a script that takes a picture then runs a detection model on that image, and/or write a script that . Include the script at the end of your lab report.
 6. Describe what the script you wrote does (document it.) 
+In our script, we run a detection model on the picture we captured or an arbitrary image. We first capture a picture with the camera, and store it into the disk. After that, we either load the captured image or an arbitrary image we set to run the detection model. Finally we store the detection result as an image into the disk.
 7. Did you have any trouble getting this running? If so, describe what difficulties you ran into, and how you tried to resolve them.
-
+One of the trouble was installing torchvision package. Since nvidia jetson uses ARM architecture, there was no way to install torchvision in normal way. Therefore we had to download the source code, and ran & compiled it manually.
+Another trouble we encountered was that pytorch or torchvision always came out abnormal errors, expecially during IO. I believed the reason would be  some instructions used to load and store were not capable with ARM processor. I changed all IO functions into opencv functions to solve the problem.

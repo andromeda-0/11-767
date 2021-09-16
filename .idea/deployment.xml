@@ -19,7 +19,7 @@
       <paths name="zongyuez@triplefighting.wifi.local.cmu.edu:22 password">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/zongyuez/project" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/zongyuez/project_zz" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

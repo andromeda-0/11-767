@@ -16,7 +16,7 @@ def plot_line_chart(all_y, all_model_names):
     plt.xlabel('Image shape (3, size, size)')
     plt.ylabel('Latency (ms)')
 
-    plt.savefig('bjj.png')
+    plt.savefig('bjj_detection.png')
     plt.close()
 
 

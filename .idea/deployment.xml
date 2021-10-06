@@ -9,17 +9,17 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="zongyuez@triplefighting.wifi.local.cmu.edu">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="zongyuez@triplefighting.wifi.local.cmu.edu:22 password">
         <serverdata>
           <mappings>
             <mapping deploy="/home/zongyuez/project_zz" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="zongyuez@zongyuez:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/zongyuez/project" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

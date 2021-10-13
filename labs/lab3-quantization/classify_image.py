@@ -4,7 +4,7 @@ from torchvision import transforms
 from PIL import Image
 
 labels = [line.strip() for line in open("imagenet_labels.txt")]
-model = models.quantization.mobilenet_v2(pretrained=True, quantize=True)
+model = models.quantization.mobilenet_v3_large(pretrained=True, quantize=True)
 model.eval()
 
 transform = transforms.Compose([transforms.Resize(255),

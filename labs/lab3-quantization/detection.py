@@ -9,13 +9,13 @@ def main():
         print(device_str)
         device = torch.device(device_str)
         for model in [
-            torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
-                    pretrained=True).to(device),
-            torchvision.models.detection.ssdlite320_mobilenet_v3_large(
+            # torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
+            #         pretrained=True).to(device),
+            torchvision.models.detection.maskrcnn_resnet50_fpn(
                     pretrained=True).to(device)
         ]:
             print(model.__class__)
-            # torch.save(model, './' + str(model._get_name()) + '.pt')
+            torch.save(model, './' + str(model._get_name()) + '.pt')
             model.eval()
             x = [torch.rand(3, 224, 224, device=device)]
             for _ in range(10):
@@ -35,8 +35,8 @@ def main():
                 print('Standard Deviation:', time.std())
 
             model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear})
-            # torch.save(model, './' + str(model._get_name()) + '_quantized.pt')
-            # print(model)
+            torch.save(model, './' + str(model._get_name()) + '_quantized.pt')
+            print(model)
 
             model.eval()
             x = [torch.rand(3, 224, 224, device=device)]

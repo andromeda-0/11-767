@@ -9,14 +9,10 @@ from torch.utils.data.dataset import T_co
 from PIL import Image
 from torch.utils.data import Dataset
 import torchvision
-from sklearn.model_selection import KFold
 from typing import Sequence
 from abc import ABC, abstractmethod
-from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 from typing import List, Optional, Dict, Union
-from matplotlib import pyplot as plt
-from matplotlib import patches
 
 num_workers = 4
 data_root = 'D:/11767/Mask'
@@ -32,6 +28,7 @@ class Params(ABC):
     max_epoch: int = field(default=101)
     is_double: int = field(default=False)
     device: torch.device = field(default=torch.device("cuda:0"))
+    dropout: float = field(default=0.)
     input_dims: tuple = field(default=(3, 1024, 1024))
     output_channels: int = field(default=3)
 
@@ -119,13 +116,16 @@ class Subset(Dataset[T_co]):
 
 
 class ParamsDetection(Params):
-    def __init__(self, B, lr, device, flip, normalize,
-                 max_epoch=201, data_dir='D:/11767/Mask'):
+    def __init__(self, B, lr, dropout, device, flip, normalize, rotate,
+                 erase, perspective, max_epoch=201, data_dir='D:/11767/Mask'):
 
-        super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
-                         data_dir=data_dir, device=device, input_dims=(3, 480, 640))
+        self.size = 1024
 
-        self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
+        super().__init__(B=B, lr=lr, max_epoch=max_epoch, dropout=dropout, output_channels=4000,
+                         data_dir=data_dir, device=device, input_dims=(3, self.size, self.size))
+
+        self.str = 'class_b=' + str(self.B) + 'lr=' + str(
+                self.lr) + '_'  # 'd=' + str(self.dropout)'
 
         transforms_train = []
         transforms_test = []
@@ -133,6 +133,14 @@ class ParamsDetection(Params):
         if flip:
             transforms_train.append(torchvision.transforms.RandomHorizontalFlip())
             self.str = self.str + 'f'
+
+        if rotate:
+            transforms_train.append(torchvision.transforms.RandomRotation(15))
+            self.str = self.str + 'r'
+
+        if perspective:
+            transforms_train.append(torchvision.transforms.RandomPerspective())
+            self.str = self.str + 'p'
 
         transforms_train.append(torchvision.transforms.ToTensor())
         transforms_test.append(torchvision.transforms.ToTensor())
@@ -143,6 +151,10 @@ class ParamsDetection(Params):
                     torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)))
             transforms_train.append(
                     torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)))
+
+        if erase:
+            transforms_train.append(torchvision.transforms.RandomErasing())
+            self.str = self.str + 'e'
 
         self.transforms_train = torchvision.transforms.Compose(transforms_train)
         self.transforms_test = torchvision.transforms.Compose(transforms_test)
@@ -215,8 +227,6 @@ class Learning(ABC):
 
         self.init_epoch = 0
 
-        self.k_fold = KFold(n_splits=5, shuffle=True)
-
         self.dataset = DetectionSet()
         self.train_loader = None
         self.valid_loader = None
@@ -273,119 +283,33 @@ class Learning(ABC):
             if 'loss_state_dict' in loaded:
                 self.criterion.load_state_dict(loaded['loss_state_dict'], strict=False)
 
-    def save_model(self, epoch):
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'loss_state_dict': self.criterion.state_dict() if self.criterion is not None else None,
-        }, 'checkpoints/' + str(self) + 'e=' + str(epoch) + '.pt')
-
-    def train(self, checkpoint_interval=20):
-        if self.train_loader is None:
-            self._load_train()
-
-        self._validate(0)
-
-        print('Training...')
-        with torch.cuda.device(self.device):
-            self.model.train()
-            for epoch in range(self.init_epoch + 1, self.params.max_epoch):
-                total_loss = torch.zeros(1, device=self.device)
-                for i, batch in enumerate(tqdm(self.train_loader)):
-                    images = list(bx.to(self.device) for bx in batch[0])
-                    annotations = list(
-                            {k: v.to(self.device) for k, v in by.items()} for by in batch[1])
-
-                    loss_dict = self.model(images, annotations)
-
-                    loss = torch.stack([l for l in loss_dict.values()]).sum()
-
-                    total_loss += loss
-
-                    self.optimizer.zero_grad()
-                    loss.backward()
-                    self.optimizer.step()
-                loss_item = total_loss.item() / (i + 1)
-                self.writer.add_scalar('Loss/Train', loss_item, epoch)
-                print('epoch: ', epoch, 'Training Loss: ', "%.5f" % loss_item)
-
-                self._validate(epoch)
-                self.model.train()
-
-                if epoch % checkpoint_interval == 0:
-                    self.save_model(epoch)
-
     def test(self):
-        self._validate(self.init_epoch)
-
-    def _validate(self, epoch, verbose=True):
-        if self.valid_loader is None:
-            self._load_valid()
-
-        # print('Validating...')
-        with torch.cuda.device(self.device):
-            with torch.no_grad():
-                self.model.eval()
-                total_acc = torch.zeros(1, device=self.device)
-                for i, batch in enumerate(self.valid_loader):
-                    images = list(bx.to(self.device) for bx in batch[0])
-                    annotations = list(
-                            {k: v.to(self.device) for k, v in by.items()} for by in batch[1])
-                    output = self.model(images)
-                    if verbose:
-                        self.plot_image(images[0], output[0])
-
-        #             prediction = list(result['labels'] for result in output)
-        #             y_prime = torch.argmax(prediction, dim=1)
-        #             total_acc += torch.count_nonzero(torch.eq(y_prime, annotations))
-        #
-        #         accuracy_item = total_acc.item() / (i + 1) / self.params.B
-        #         self.writer.add_scalar('Accuracy/Validation', accuracy_item, epoch)
-        #         print('epoch: ', epoch, 'Validation Accuracy: ', "%.5f" % accuracy_item)
-
-    def plot_image(self, img_tensor, annotation, threshold=0.5):
-        fig, ax = plt.subplots(1)
-        img = img_tensor.cpu().data
-
-        # Display the image
-        ax.imshow(img.permute(1, 2, 0))
-
-        for score, box, label in zip(annotation['scores'], annotation["boxes"],
-                                     annotation['labels']):
-            score = score.item()
-            if score < threshold:
-                continue
-            xmin, ymin, xmax, ymax = box
-
-            rect = patches.Rectangle((xmin, ymin), (xmax - xmin), (ymax - ymin), linewidth=1,
-                                     edgecolor='r', facecolor='none')
-
-            ax.add_patch(rect)
-            ax.text(xmin, ymin, '%s: %.2f' % (self.label_to_class[label.item()], score))
-
-        plt.show()
+        pass
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', help='Batch Size', default=1, type=int)
-    parser.add_argument('--lr', default=1e-3, type=float)
-    parser.add_argument('--gpu_id', help='GPU ID (0/1)', default='0')
+    parser.add_argument('--dropout', default=0.4, type=float)
+    parser.add_argument('--lr', default=1e-4, type=float)
+    parser.add_argument('--gpu_id', help='GPU ID', default='0')
     parser.add_argument('--model', default='FasterRCNN_mobilenet_v3_large_fpn', help='Model Name')
     parser.add_argument('--epoch', default=-1, help='Load Epoch', type=int)
-    parser.add_argument('--train', action='store_true')
-    parser.add_argument('--test', action='store_true')
     parser.add_argument('--flip', action='store_true')
     parser.add_argument('--normalize', action='store_true')
+    parser.add_argument('--erase', action='store_true')
     parser.add_argument('--save', default=10, type=int, help='Checkpoint interval')
+    parser.add_argument('--perspective', action='store_true')
     parser.add_argument('--load', default='', help='Load Name')
+    parser.add_argument('--rotate', action='store_true')
 
     args = parser.parse_args()
 
-    params = ParamsDetection(B=args.batch, lr=args.lr,
+    params = ParamsDetection(B=args.batch, dropout=args.dropout, lr=args.lr,
                              device='cuda:' + args.gpu_id, flip=args.flip,
-                             normalize=args.normalize)
+                             normalize=args.normalize, erase=args.erase,
+                             perspective=args.perspective,
+                             rotate=args.rotate)
     model = eval(args.model + '(params)')
     learner = Learning(params, model)
     if args.epoch >= 0:
@@ -394,10 +318,7 @@ def main():
         else:
             learner.load_model(args.epoch, args.load)
 
-    if args.train:
-        learner.train(args.save)
-    if args.test:
-        learner.test()
+    learner.test()
 
 
 if __name__ == '__main__':

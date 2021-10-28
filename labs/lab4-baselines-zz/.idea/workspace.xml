@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="15e5c64e-fd4a-4249-b5dd-77176fdc9a63" name="Changes" comment="Fix input size">
+      <change beforePath="$PROJECT_DIR$/../../.idea/Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635378452.Zongyue.21876.0" beforeDir="false" afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635378452.Zongyue.21876.0" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fixed_split.py" beforeDir="false" afterPath="$PROJECT_DIR$/fixed_split.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +47,7 @@
       <recent name="C:\Users\Zongyue\OneDrive\Documents\CMU\21Fall\11767\Project\labs\lab4-baselines-zz" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.fixed_split">
+  <component name="RunManager" selected="Python.fixed_split Device 1 (1)">
     <configuration default="true" type="MatlabApplication">
       <option name="FILE_PATH" value="" />
       <option name="INTERPRETER_PATH" value="" />
@@ -77,6 +79,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="fixed_split Device 1 (1)" type="PythonConfigurationType" factoryName="Python">
+      <module name="lab4-baselines-zz" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Zongyue\anaconda3\envs\11767\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fixed_split.py" />
+      <option name="PARAMETERS" value="--gpu_id 1 --train --model FasterRCNN_mobilenet_v3_large_fpn" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="fixed_split Device 1" type="PythonConfigurationType" factoryName="Python">
       <module name="lab4-baselines-zz" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -91,7 +115,29 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fixed_split.py" />
-      <option name="PARAMETERS" value="--gpu_id 1 --train --normalize --model FasterRCNN_mobilenet_v3_large_fpn_original --verbose" />
+      <option name="PARAMETERS" value="--gpu_id 1 --train --model FasterRCNN_mobilenet_v3_large_fpn_original_train_all" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="fixed_split (1)" type="PythonConfigurationType" factoryName="Python">
+      <module name="lab4-baselines-zz" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Zongyue\anaconda3\envs\11767\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fixed_split.py" />
+      <option name="PARAMETERS" value="--train --model FasterRCNN_mobilenet_v3_large_fpn_train_all" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -113,7 +159,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fixed_split.py" />
-      <option name="PARAMETERS" value="--train --model FasterRCNN_mobilenet_v3_large_fpn_original --epoch 40 --verbose" />
+      <option name="PARAMETERS" value="--train --model FasterRCNN_mobilenet_v3_large_fpn_original" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -124,7 +170,9 @@
     <list>
       <item itemvalue="Python.dataset" />
       <item itemvalue="Python.fixed_split" />
+      <item itemvalue="Python.fixed_split (1)" />
       <item itemvalue="Python.fixed_split Device 1" />
+      <item itemvalue="Python.fixed_split Device 1 (1)" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -139,6 +187,7 @@
       <workItem from="1635356649051" duration="12588000" />
       <workItem from="1635375286807" duration="5128000" />
       <workItem from="1635385753015" duration="1686000" />
+      <workItem from="1635396268337" duration="352000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <created>1635356093619</created>
@@ -211,8 +260,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split.coverage" NAME="fixed_split Coverage Results" MODIFIED="1635378450947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split.coverage" NAME="fixed_split Coverage Results" MODIFIED="1635396530994" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lab4_baselines_zz$parse_labels.coverage" NAME="parse_labels Coverage Results" MODIFIED="1635315980801" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split_Device_1.coverage" NAME="fixed_split Device 1 Coverage Results" MODIFIED="1635377502942" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split_Device_1.coverage" NAME="fixed_split Device 1 Coverage Results" MODIFIED="1635396525619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

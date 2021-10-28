@@ -119,7 +119,7 @@ class Subset(Dataset[T_co]):
 
 class ParamsDetection(Params):
     def __init__(self, B, lr, device, flip, normalize, vis_threshold, verbose,
-                 max_epoch=201, data_dir='D:/11767/Mask'):
+                 max_epoch=101, data_dir=data_root):
 
         super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
                          data_dir=data_dir, device=device, input_dims=(3, 480, 640))
@@ -204,6 +204,25 @@ class FasterRCNN_mobilenet_v3_large_fpn_original(Model):
 
     def trainable(self):
         return self.net.roi_heads.box_predictor.parameters()
+
+
+class FasterRCNN_mobilenet_v3_large_fpn_original_train_all(Model):
+    def __init__(self, params: ParamsDetection):
+        super().__init__(params)
+        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(
+                pretrained=True, trainable_backbone_layers=5)
+        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
+        # replace the pre-trained head with a new one
+        self.net.roi_heads.box_predictor = \
+            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
+                    in_features, self.params.output_channels)
+
+    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) \
+            -> Union[Dict, List[Dict]]:
+        return self.net(images, annotations)
+
+    def trainable(self):
+        return self.net.parameters()
 
 
 class FasterRCNN_mobilenet_v3_large_fpn_train_all(Model):
@@ -415,7 +434,7 @@ def main():
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--flip', action='store_true')
     parser.add_argument('--normalize', action='store_true')
-    parser.add_argument('--save', default=10, type=int, help='Checkpoint interval')
+    parser.add_argument('--save', default=20, type=int, help='Checkpoint interval')
     parser.add_argument('--load', default='', help='Load Name')
     parser.add_argument('--vis_threshold', default=0.0, type=float)
     parser.add_argument('--verbose', action='store_true')

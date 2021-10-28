@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="zongyuez@triplefighting.wifi.local.cmu.edu:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="zongyuez@zongyuez:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="zongyuez@ripley.ri.cmu.edu:22">
         <serverdata>
@@ -19,10 +19,11 @@
       <paths name="zongyuez@zongyuez:22">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/zongyuez/project" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

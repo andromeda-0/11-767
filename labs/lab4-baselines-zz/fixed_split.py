@@ -9,7 +9,6 @@ from torch.utils.data.dataset import T_co
 from PIL import Image
 from torch.utils.data import Dataset
 import torchvision
-from sklearn.model_selection import KFold
 from typing import Sequence
 from abc import ABC, abstractmethod
 from tqdm import tqdm
@@ -119,13 +118,15 @@ class Subset(Dataset[T_co]):
 
 
 class ParamsDetection(Params):
-    def __init__(self, B, lr, device, flip, normalize,
+    def __init__(self, B, lr, device, flip, normalize, vis_threshold, verbose,
                  max_epoch=201, data_dir='D:/11767/Mask'):
 
         super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
                          data_dir=data_dir, device=device, input_dims=(3, 480, 640))
 
+        self.vis_threshold = vis_threshold
         self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
+        self.verbose = verbose
 
         transforms_train = []
         transforms_test = []
@@ -186,6 +187,44 @@ class FasterRCNN_mobilenet_v3_large_fpn(Model):
         return self.net.roi_heads.box_predictor.parameters()
 
 
+class FasterRCNN_mobilenet_v3_large_fpn_original(Model):
+    def __init__(self, params: ParamsDetection):
+        super().__init__(params)
+        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(
+                pretrained=True)
+        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
+        # replace the pre-trained head with a new one
+        self.net.roi_heads.box_predictor = \
+            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
+                    in_features, self.params.output_channels)
+
+    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) -> Union[
+        Dict, List[Dict]]:
+        return self.net(images, annotations)
+
+    def trainable(self):
+        return self.net.roi_heads.box_predictor.parameters()
+
+
+class FasterRCNN_mobilenet_v3_large_fpn_train_all(Model):
+    def __init__(self, params: ParamsDetection):
+        super().__init__(params)
+        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
+                pretrained=False, trainable_backbone_layers=5)
+        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
+        # replace the pre-trained head with a new one
+        self.net.roi_heads.box_predictor = \
+            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
+                    in_features, self.params.output_channels)
+
+    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) -> Union[
+        Dict, List[Dict]]:
+        return self.net(images, annotations)
+
+    def trainable(self):
+        return self.net.parameters()
+
+
 class Learning(ABC):
     def __init__(self, params: ParamsDetection, model: Model, optimizer_handle=torch.optim.Adam,
                  criterion_handle=None, draw_graph=False, string=None):
@@ -214,8 +253,6 @@ class Learning(ABC):
             self.criterion = None
 
         self.init_epoch = 0
-
-        self.k_fold = KFold(n_splits=5, shuffle=True)
 
         self.dataset = DetectionSet()
         self.train_loader = None
@@ -319,7 +356,7 @@ class Learning(ABC):
     def test(self):
         self._validate(self.init_epoch)
 
-    def _validate(self, epoch, verbose=True):
+    def _validate(self, epoch):
         if self.valid_loader is None:
             self._load_valid()
 
@@ -333,7 +370,7 @@ class Learning(ABC):
                     annotations = list(
                             {k: v.to(self.device) for k, v in by.items()} for by in batch[1])
                     output = self.model(images)
-                    if verbose:
+                    if self.params.verbose:
                         self.plot_image(images[0], output[0])
 
         #             prediction = list(result['labels'] for result in output)
@@ -344,7 +381,7 @@ class Learning(ABC):
         #         self.writer.add_scalar('Accuracy/Validation', accuracy_item, epoch)
         #         print('epoch: ', epoch, 'Validation Accuracy: ', "%.5f" % accuracy_item)
 
-    def plot_image(self, img_tensor, annotation, threshold=0.5):
+    def plot_image(self, img_tensor, annotation):
         fig, ax = plt.subplots(1)
         img = img_tensor.cpu().data
 
@@ -354,7 +391,7 @@ class Learning(ABC):
         for score, box, label in zip(annotation['scores'], annotation["boxes"],
                                      annotation['labels']):
             score = score.item()
-            if score < threshold:
+            if score < self.params.vis_threshold:
                 continue
             xmin, ymin, xmax, ymax = box
 
@@ -380,12 +417,14 @@ def main():
     parser.add_argument('--normalize', action='store_true')
     parser.add_argument('--save', default=10, type=int, help='Checkpoint interval')
     parser.add_argument('--load', default='', help='Load Name')
+    parser.add_argument('--vis_threshold', default=0.0, type=float)
+    parser.add_argument('--verbose', action='store_true')
 
     args = parser.parse_args()
 
-    params = ParamsDetection(B=args.batch, lr=args.lr,
+    params = ParamsDetection(B=args.batch, lr=args.lr, verbose=args.verbose,
                              device='cuda:' + args.gpu_id, flip=args.flip,
-                             normalize=args.normalize)
+                             normalize=args.normalize, vis_threshold=args.vis_threshold)
     model = eval(args.model + '(params)')
     learner = Learning(params, model)
     if args.epoch >= 0:

@@ -2,17 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="15e5c64e-fd4a-4249-b5dd-77176fdc9a63" name="Changes" comment="Model">
-      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_class_b=1lr=0.001_/events.out.tfevents.1635402193.Zongyue.19868.0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635401947.Zongyue.828.0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635401997.Zongyue.19260.0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635402050.Zongyue.20336.0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_train_all_class_b=1lr=0.001_/events.out.tfevents.1635402107.Zongyue.7876.0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_train_all_class_b=1lr=0.001_/events.out.tfevents.1635402135.Zongyue.17092.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635474555.Zongyue.20548.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635475531.Zongyue.12884.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635473915.Zongyue.21448.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635473929.Zongyue.4992.0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635473939.Zongyue.18420.0" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_class_b=1lr=0.001_/events.out.tfevents.1635396629.Zongyue.14172.0" beforeDir="false" afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_class_b=1lr=0.001_/events.out.tfevents.1635396629.Zongyue.14172.0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635396532.Zongyue.12956.0" beforeDir="false" afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635396532.Zongyue.12956.0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635396528.Zongyue.6500.0" beforeDir="false" afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635396528.Zongyue.6500.0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_train_all_class_b=1lr=0.001_/events.out.tfevents.1635396627.Zongyue.14804.0" beforeDir="false" afterPath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_train_all_class_b=1lr=0.001_/events.out.tfevents.1635396627.Zongyue.14804.0" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635376553.Zongyue.18076.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635378452.Zongyue.21876.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635401947.Zongyue.828.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635401997.Zongyue.19260.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635402050.Zongyue.20336.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_fn/events.out.tfevents.1635376556.Zongyue.19552.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_n/events.out.tfevents.1635377504.Zongyue.24340.0" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +48,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/fixed_split.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../../../../Desktop" />
     <property name="settings.editor.selected.configurable" value="preferences.general" />
   </component>
   <component name="RecentsManager">
@@ -54,7 +56,7 @@
       <recent name="C:\Users\Zongyue\OneDrive\Documents\CMU\21Fall\11767\Project\labs\lab4-baselines-zz" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.fixed_split Device 1 (1)">
+  <component name="RunManager" selected="Python.fixed_split">
     <configuration default="true" type="MatlabApplication">
       <option name="FILE_PATH" value="" />
       <option name="INTERPRETER_PATH" value="" />
@@ -122,7 +124,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fixed_split.py" />
-      <option name="PARAMETERS" value="--gpu_id 1 --train --model FasterRCNN_mobilenet_v3_large_fpn_original_train_all" />
+      <option name="PARAMETERS" value="--gpu_id 1 --test --verbose --epoch 100 --model FasterRCNN_mobilenet_v3_large_fpn_original_train_all" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -176,10 +178,10 @@
     </configuration>
     <list>
       <item itemvalue="Python.dataset" />
-      <item itemvalue="Python.fixed_split" />
-      <item itemvalue="Python.fixed_split (1)" />
-      <item itemvalue="Python.fixed_split Device 1" />
       <item itemvalue="Python.fixed_split Device 1 (1)" />
+      <item itemvalue="Python.fixed_split Device 1" />
+      <item itemvalue="Python.fixed_split (1)" />
+      <item itemvalue="Python.fixed_split" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -194,7 +196,8 @@
       <workItem from="1635356649051" duration="12588000" />
       <workItem from="1635375286807" duration="5128000" />
       <workItem from="1635385753015" duration="1686000" />
-      <workItem from="1635396268337" duration="3836000" />
+      <workItem from="1635396268337" duration="3845000" />
+      <workItem from="1635463108246" duration="3912000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <created>1635356093619</created>
@@ -238,7 +241,14 @@
       <option name="project" value="LOCAL" />
       <updated>1635396836880</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Model">
+      <created>1635403259089</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1635403259089</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -275,9 +285,9 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split.coverage" NAME="fixed_split Coverage Results" MODIFIED="1635402049628" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split.coverage" NAME="fixed_split Coverage Results" MODIFIED="1635475530168" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lab4_baselines_zz$parse_labels.coverage" NAME="parse_labels Coverage Results" MODIFIED="1635315980801" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split_Device_1.coverage" NAME="fixed_split Device 1 Coverage Results" MODIFIED="1635396525619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split_Device_1.coverage" NAME="fixed_split Device 1 Coverage Results" MODIFIED="1635473938100" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split_Device_1__1_.coverage" NAME="fixed_split Device 1 (1) Coverage Results" MODIFIED="1635402192018" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lab4_baselines_zz$fixed_split__1_.coverage" NAME="fixed_split (1) Coverage Results" MODIFIED="1635402134649" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

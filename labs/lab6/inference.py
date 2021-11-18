@@ -17,6 +17,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Union
 from tqdm import tqdm
 import torchmetrics
+from torch.nn import functional as F
 
 num_workers = 0
 data_root = '/home/zongyuez/data/Mask'
@@ -120,22 +121,17 @@ class Subset(Dataset[T_co]):
 
 
 class ParamsDetection(Params):
-    def __init__(self, B, lr, device, flip, normalize, vis_threshold, verbose,
+    def __init__(self, B, lr, device, normalize, vis_threshold, verbose, down_sample,
                  max_epoch=201, data_dir=data_root):
-
         super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
                          data_dir=data_dir, device=device, input_dims=(3, 480, 640))
-
+        self.down_sample = down_sample
         self.vis_threshold = vis_threshold
-        self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
+        self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + 'ds=' + str(down_sample) + '_'
         self.verbose = verbose
 
         transforms_train = []
         transforms_test = []
-
-        if flip:
-            transforms_train.append(torchvision.transforms.RandomHorizontalFlip())
-            self.str = self.str + 'f'
 
         transforms_train.append(torchvision.transforms.ToTensor())
         transforms_test.append(torchvision.transforms.ToTensor())
@@ -147,11 +143,23 @@ class ParamsDetection(Params):
             transforms_train.append(
                     torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)))
 
+        if abs(down_sample - 1.0) > 0.01:
+            transforms_train.append(RescaleTransform(down_sample))
+            transforms_test.append(RescaleTransform(down_sample))
+
         self.transforms_train = torchvision.transforms.Compose(transforms_train)
         self.transforms_test = torchvision.transforms.Compose(transforms_test)
 
     def __str__(self):
         return self.str
+
+
+class RescaleTransform:
+    def __init__(self, scale):
+        self.scale = scale
+
+    def __call__(self, x):
+        return F.interpolate(x, scale_factor=self.scale)
 
 
 class Model(nn.Module, ABC):
@@ -341,13 +349,14 @@ def main():
     parser.add_argument('--load', default='', help='Load Name')
     parser.add_argument('--vis_threshold', default=0.0, type=float)
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--down_sample', default=1.0, type=float)
 
     args = parser.parse_args()
 
     dev = 'cuda:' + args.gpu_id if int(args.gpu_id) >= 0 else 'cpu'
 
     params = ParamsDetection(B=args.batch, lr=args.lr, verbose=args.verbose,
-                             device=dev, flip=args.flip,
+                             device=dev, down_sample=args.down_sample,
                              normalize=args.normalize, vis_threshold=args.vis_threshold)
     model = eval(args.model + '(params)')
     learner = Learning(params, model)

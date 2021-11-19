@@ -1,4 +1,6 @@
 import argparse
+
+import numpy as np
 import torch
 import torch.nn as nn
 from bs4 import BeautifulSoup
@@ -22,16 +24,10 @@ except ImportError:
     plt = None
     patches = None
 
-num_workers = 4
-data_root = '/home/zongyuez/data/Mask'
-image_root = os.path.join(data_root, 'images')
-metadata_root = os.path.join(data_root, 'annotations')
-
 
 @dataclass
 class Params(ABC):
     B: int = field(default=4)
-    data_dir: str = field(default='')
     lr: float = field(default=1e-3)
     max_epoch: int = field(default=101)
     is_double: int = field(default=False)
@@ -48,43 +44,14 @@ def collate_fn(batch):
     return tuple(zip(*batch))
 
 
-def load_label(image_id: int) -> int:
-    """
-    integer 0 (no_mask), 1 (correct_mask), or 2 (incorrect_mask).
-    """
-    metadata_path = os.path.join(metadata_root, 'maksssksksss' + str(image_id) + '.xml')
-    with open(metadata_path, 'r') as f:
-        data = f.read()
-        soup = BeautifulSoup(data, 'lxml')
-        objects = soup.find_all('object')
-
-        has_correct_mask = False
-        has_incorrect_mask = False
-
-        for i, item in enumerate(objects):
-            label_text = item.find('name').text
-            if label_text == 'with_mask':
-                has_correct_mask = True
-            elif label_text == 'mask_weared_incorrect':
-                has_incorrect_mask = True
-
-        if has_incorrect_mask:
-            return 2
-
-        if has_correct_mask:
-            return 1
-
-        return 0
-
-
-class DetectionSet(Dataset):
+class ClassificationSet(Dataset):
     def __getitem__(self, index) -> T_co:
         """
         Image, Label
         """
         image_path = 'maksssksksss' + str(index) + '.png'
         image = Image.open(os.path.join(image_root, image_path)).convert('RGB')
-        label = load_label(index)
+        label = self.labels[index]
 
         return image, label
 
@@ -93,6 +60,7 @@ class DetectionSet(Dataset):
 
     def __init__(self):
         self.size = len(os.listdir(image_root))
+        self.labels = np.load(label_root)
 
 
 class Subset(Dataset[T_co]):
@@ -119,12 +87,12 @@ class Subset(Dataset[T_co]):
         return len(self.indices)
 
 
-class ParamsDetection(Params):
+class ParamsClassification(Params):
     def __init__(self, B, lr, device, flip, normalize, vis_threshold, verbose,
-                 max_epoch=101, data_dir=data_root):
+                 max_epoch=101):
 
         super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
-                         data_dir=data_dir, device=device, input_dims=(3, 480, 640))
+                         device=device, input_dims=(3, 480, 640))
 
         self.vis_threshold = vis_threshold
         self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
@@ -156,13 +124,12 @@ class ParamsDetection(Params):
 
 class Model(nn.Module, ABC):
     @abstractmethod
-    def __init__(self, params: ParamsDetection):
+    def __init__(self, params: ParamsClassification):
         super().__init__()
         self.params = params
 
     @abstractmethod
-    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) -> Union[
-        Dict, List[Dict]]:
+    def forward(self, x):
         pass
 
     @abstractmethod
@@ -170,87 +137,33 @@ class Model(nn.Module, ABC):
         pass
 
 
-class FasterRCNN_mobilenet_v3_large_fpn(Model):
-    def __init__(self, params: ParamsDetection):
-        super(FasterRCNN_mobilenet_v3_large_fpn, self).__init__(params)
-        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
-                pretrained=True)
-        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
-        # replace the pre-trained head with a new one
-        self.net.roi_heads.box_predictor = \
-            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-                    in_features, self.params.output_channels)
-
-    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) -> Union[
-        Dict, List[Dict]]:
-        return self.net(images, annotations)
-
-    def trainable(self):
-        return self.net.roi_heads.box_predictor.parameters()
-
-
-class FasterRCNN_mobilenet_v3_large_fpn_original(Model):
-    def __init__(self, params: ParamsDetection):
+class MobileNetV3Large(Model):
+    def __init__(self, params: ParamsClassification):
         super().__init__(params)
-        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(
-                pretrained=True)
-        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
-        # replace the pre-trained head with a new one
-        self.net.roi_heads.box_predictor = \
-            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-                    in_features, self.params.output_channels)
+        self.net = torchvision.models.mobilenet_v3_large(pretrained=True, progress=False).features
 
-    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) -> Union[
-        Dict, List[Dict]]:
-        return self.net(images, annotations)
+        for param in self.net.parameters():
+            param.requires_grad = False
 
-    def trainable(self):
-        return self.net.roi_heads.box_predictor.parameters()
+        self.pooling = nn.AdaptiveAvgPool2d(1)
+        self.classifier = nn.Linear(960, params.output_channels)
 
-
-class FasterRCNN_mobilenet_v3_large_fpn_original_train_all(Model):
-    def __init__(self, params: ParamsDetection):
-        super().__init__(params)
-        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(
-                pretrained=True, trainable_backbone_layers=5)
-        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
-        # replace the pre-trained head with a new one
-        self.net.roi_heads.box_predictor = \
-            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-                    in_features, self.params.output_channels)
-
-    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) \
-            -> Union[Dict, List[Dict]]:
-        return self.net(images, annotations)
+    def forward(self, x):
+        x = self.net(x)
+        x = self.pooling(x)
+        x = torch.flatten(x, 1)
+        return self.classifier(x)
 
     def trainable(self):
-        return self.net.parameters()
-
-
-class FasterRCNN_mobilenet_v3_large_fpn_train_all(Model):
-    def __init__(self, params: ParamsDetection):
-        super().__init__(params)
-        self.net = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_320_fpn(
-                pretrained=False, trainable_backbone_layers=5)
-        in_features = self.net.roi_heads.box_predictor.cls_score.in_features
-        # replace the pre-trained head with a new one
-        self.net.roi_heads.box_predictor = \
-            torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-                    in_features, self.params.output_channels)
-
-    def forward(self, images: List[Tensor], annotations: Optional[List[Dict]] = None) -> Union[
-        Dict, List[Dict]]:
-        return self.net(images, annotations)
-
-    def trainable(self):
-        return self.net.parameters()
+        return self.classifier.parameters()
 
 
 class Learning(ABC):
-    def __init__(self, params: ParamsDetection, model: Model, optimizer_handle=torch.optim.Adam,
-                 criterion_handle=None, draw_graph=False, string=None):
+    def __init__(self, params: ParamsClassification, model: Model,
+                 optimizer_handle=torch.optim.Adam,
+                 criterion_handle=nn.CrossEntropyLoss, draw_graph=False, string=None):
 
-        self.params: ParamsDetection = params
+        self.params: ParamsClassification = params
         self.device = params.device
         self.str = model.__class__.__name__ + '_' + str(params) if string is None else string
 
@@ -275,7 +188,7 @@ class Learning(ABC):
 
         self.init_epoch = 0
 
-        self.dataset = DetectionSet()
+        self.dataset = ClassificationSet()
         self.train_loader = None
         self.valid_loader = None
         self.test_loader = None
@@ -346,33 +259,37 @@ class Learning(ABC):
         self._validate(0)
 
         print('Training...')
-        with torch.cuda.device(self.device):
+        self.model.train()
+        for epoch in range(self.init_epoch + 1, self.params.max_epoch):
+            total_loss = torch.zeros(1, device=self.device)
+            total_acc = torch.zeros(1, device=self.device)
+            i = 0
+            for i, batch in enumerate(tqdm(self.train_loader)):
+                bx = batch[0].to(self.device)
+                by = batch[1].to(self.device)
+
+                prediction = self.model(bx)
+                loss = self.criterion(prediction, by)
+
+                total_loss += loss
+                y_prime = torch.argmax(prediction, dim=1)
+                total_acc += torch.count_nonzero(torch.eq(y_prime, by))
+
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+            loss_item = total_loss.item() / (i + 1)
+            accuracy_item = total_acc.item() / (i + 1) / self.params.B
+            self.writer.add_scalar('Loss/Train', loss_item, epoch)
+            self.writer.add_scalar('Accuracy/Train', accuracy_item, epoch)
+            print('epoch: ', epoch, 'Training Loss: ', "%.5f" % loss_item,
+                  'Accuracy: ', "%.5f" % accuracy_item)
+
+            self._validate(epoch)
             self.model.train()
-            for epoch in range(self.init_epoch + 1, self.params.max_epoch):
-                total_loss = torch.zeros(1, device=self.device)
-                for i, batch in enumerate(tqdm(self.train_loader)):
-                    images = list(bx.to(self.device) for bx in batch[0])
-                    annotations = list(
-                            {k: v.to(self.device) for k, v in by.items()} for by in batch[1])
 
-                    loss_dict = self.model(images, annotations)
-
-                    loss = torch.stack([l for l in loss_dict.values()]).sum()
-
-                    total_loss += loss
-
-                    self.optimizer.zero_grad()
-                    loss.backward()
-                    self.optimizer.step()
-                loss_item = total_loss.item() / (i + 1)
-                self.writer.add_scalar('Loss/Train', loss_item, epoch)
-                print('epoch: ', epoch, 'Training Loss: ', "%.5f" % loss_item)
-
-                self._validate(epoch)
-                self.model.train()
-
-                if epoch % checkpoint_interval == 0:
-                    self.save_model(epoch)
+            if epoch % checkpoint_interval == 0:
+                self.save_model(epoch)
 
     def test(self):
         self._validate(self.init_epoch)
@@ -381,56 +298,34 @@ class Learning(ABC):
         if self.valid_loader is None:
             self._load_valid()
 
-        # print('Validating...')
-        with torch.cuda.device(self.device):
-            with torch.no_grad():
-                self.model.eval()
-                total_acc = torch.zeros(1, device=self.device)
-                for i, batch in enumerate(self.valid_loader):
-                    images = list(bx.to(self.device) for bx in batch[0])
-                    annotations = list(
-                            {k: v.to(self.device) for k, v in by.items()} for by in batch[1])
-                    output = self.model(images)
-                    if self.params.verbose:
-                        self.plot_image(images[0], output[0])
+        with torch.no_grad():
+            self.model.eval()
+            total_loss = torch.zeros(1, device=self.device)
+            total_acc = torch.zeros(1, device=self.device)
+            for i, batch in enumerate(self.valid_loader):
+                bx = batch[0].to(self.device)
+                by = batch[1].to(self.device)
 
-        #             prediction = list(result['labels'] for result in output)
-        #             y_prime = torch.argmax(prediction, dim=1)
-        #             total_acc += torch.count_nonzero(torch.eq(y_prime, annotations))
-        #
-        #         accuracy_item = total_acc.item() / (i + 1) / self.params.B
-        #         self.writer.add_scalar('Accuracy/Validation', accuracy_item, epoch)
-        #         print('epoch: ', epoch, 'Validation Accuracy: ', "%.5f" % accuracy_item)
+                prediction = self.model(bx)
+                loss = self.criterion(prediction, by)
+                total_loss += loss
+                y_prime = torch.argmax(prediction, dim=1)
+                total_acc += torch.count_nonzero(torch.eq(y_prime, by))
 
-    def plot_image(self, img_tensor, annotation):
-        fig, ax = plt.subplots(1)
-        img = img_tensor.cpu().data
-
-        # Display the image
-        ax.imshow(img.permute(1, 2, 0))
-
-        for score, box, label in zip(annotation['scores'], annotation["boxes"],
-                                     annotation['labels']):
-            score = score.item()
-            if score < self.params.vis_threshold:
-                continue
-            xmin, ymin, xmax, ymax = box
-
-            rect = patches.Rectangle((xmin, ymin), (xmax - xmin), (ymax - ymin), linewidth=1,
-                                     edgecolor='r', facecolor='none')
-
-            ax.add_patch(rect)
-            ax.text(xmin, ymin, '%s: %.2f' % (self.label_to_class[label.item()], score))
-
-        plt.show()
+            loss_item = total_loss.item() / (i + 1)
+            accuracy_item = total_acc.item() / (i + 1) / self.params.B
+            self.writer.add_scalar('Loss/Validation', loss_item, epoch)
+            self.writer.add_scalar('Accuracy/Validation', accuracy_item, epoch)
+            print('epoch: ', epoch, 'Validation Loss: ', "%.5f" % loss_item,
+                  'Accuracy: ', "%.5f" % accuracy_item)
 
 
-def main():
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', help='Batch Size', default=1, type=int)
+    parser.add_argument('--batch', help='Batch Size', default=8, type=int)
     parser.add_argument('--lr', default=1e-3, type=float)
     parser.add_argument('--gpu_id', help='GPU ID (0/1)', default='0')
-    parser.add_argument('--model', default='FasterRCNN_mobilenet_v3_large_fpn', help='Model Name')
+    parser.add_argument('--model', default='MobileNetV3Large', help='Model Name')
     parser.add_argument('--epoch', default=-1, help='Load Epoch', type=int)
     parser.add_argument('--train', action='store_true')
     parser.add_argument('--test', action='store_true')
@@ -440,12 +335,19 @@ def main():
     parser.add_argument('--load', default='', help='Load Name')
     parser.add_argument('--vis_threshold', default=0.0, type=float)
     parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--data_root', default='/home/zongyuez/data/Mask')
 
     args = parser.parse_args()
 
-    params = ParamsDetection(B=args.batch, lr=args.lr, verbose=args.verbose,
-                             device='cuda:' + args.gpu_id, flip=args.flip,
-                             normalize=args.normalize, vis_threshold=args.vis_threshold)
+    num_workers = 4
+    data_root = args.data_root
+    image_root = os.path.join(data_root, 'images')
+    metadata_root = os.path.join(data_root, 'annotations')
+    label_root = os.path.join(data_root, 'classification_labels.npy')
+
+    params = ParamsClassification(B=args.batch, lr=args.lr, verbose=args.verbose,
+                                  device='cuda:' + args.gpu_id, flip=args.flip,
+                                  normalize=args.normalize, vis_threshold=args.vis_threshold)
     model = eval(args.model + '(params)')
     learner = Learning(params, model)
     if args.epoch >= 0:
@@ -458,7 +360,3 @@ def main():
         learner.train(args.save)
     if args.test:
         learner.test()
-
-
-if __name__ == '__main__':
-    main()

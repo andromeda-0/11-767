@@ -40,17 +40,13 @@ class Params(ABC):
         return ''
 
 
-def collate_fn(batch):
-    return tuple(zip(*batch))
-
-
 class ClassificationSet(Dataset):
     def __getitem__(self, index) -> T_co:
         """
         Image, Label
         """
         image_path = 'maksssksksss' + str(index) + '.png'
-        image = Image.open(os.path.join(image_root, image_path)).convert('RGB')
+        image = Image.open(os.path.join(self.image_root, image_path)).convert('RGB')
         label = self.labels[index]
 
         return image, label
@@ -58,7 +54,8 @@ class ClassificationSet(Dataset):
     def __len__(self):
         return self.size
 
-    def __init__(self):
+    def __init__(self, image_root):
+        self.image_root = image_root
         self.size = len(os.listdir(image_root))
         self.labels = np.load(label_root)
 
@@ -188,7 +185,7 @@ class Learning(ABC):
 
         self.init_epoch = 0
 
-        self.dataset = ClassificationSet()
+        self.dataset = ClassificationSet(image_root)
         self.train_loader = None
         self.valid_loader = None
         self.test_loader = None
@@ -210,22 +207,19 @@ class Learning(ABC):
         train_set = Subset(self.dataset, self.train_split, transforms=self.params.transforms_train)
         self.train_loader = torch.utils.data.DataLoader(train_set,
                                                         batch_size=self.params.B, shuffle=True,
-                                                        pin_memory=True, num_workers=num_workers,
-                                                        collate_fn=collate_fn)
+                                                        pin_memory=True, num_workers=num_workers)
 
     def _load_valid(self):
         valid_set = Subset(self.dataset, self.valid_split, transforms=self.params.transforms_test)
         self.valid_loader = torch.utils.data.DataLoader(valid_set,
                                                         batch_size=self.params.B, shuffle=False,
-                                                        pin_memory=True, num_workers=num_workers,
-                                                        collate_fn=collate_fn)
+                                                        pin_memory=True, num_workers=num_workers)
 
     def _load_test(self):
         test_set = Subset(self.dataset, self.test_split, transforms=self.params.transforms_test)
         self.test_loader = torch.utils.data.DataLoader(test_set,
                                                        batch_size=self.params.B, shuffle=False,
-                                                       pin_memory=True, num_workers=num_workers,
-                                                       collate_fn=collate_fn)
+                                                       pin_memory=True, num_workers=num_workers)
 
     def load_model(self, epoch=20, name=None, model=True, optimizer=True, loss=False):
         if name is None:
@@ -322,7 +316,7 @@ class Learning(ABC):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', help='Batch Size', default=8, type=int)
+    parser.add_argument('--batch', help='Batch Size', default=1, type=int)
     parser.add_argument('--lr', default=1e-3, type=float)
     parser.add_argument('--gpu_id', help='GPU ID (0/1)', default='0')
     parser.add_argument('--model', default='MobileNetV3Large', help='Model Name')

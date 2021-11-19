@@ -1,0 +1,64 @@
+<changelist name="Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]" date="1635476872991" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 10/28/2021 11:07 PM [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635402050.Zongyue.20336.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635473929.Zongyue.4992.0" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]/events.out.tfevents.1635473929.Zongyue.4992.0" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_n/events.out.tfevents.1635377504.Zongyue.24340.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635473915.Zongyue.21448.0" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]/events.out.tfevents.1635473915.Zongyue.21448.0" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635401947.Zongyue.828.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635475531.Zongyue.12884.0" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]/events.out.tfevents.1635475531.Zongyue.12884.0" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635376553.Zongyue.18076.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635378452.Zongyue.21876.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_train_all_class_b=1lr=0.001_/events.out.tfevents.1635473939.Zongyue.18420.0" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]/events.out.tfevents.1635473939.Zongyue.18420.0" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_fn/events.out.tfevents.1635376556.Zongyue.19552.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" />
+    <option name="AFTER_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635474555.Zongyue.20548.0" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_28_2021_11_07_PM_[Changes]/events.out.tfevents.1635474555.Zongyue.20548.0" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="runs/FasterRCNN_mobilenet_v3_large_fpn_original_class_b=1lr=0.001_/events.out.tfevents.1635401997.Zongyue.19260.0" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+</changelist>

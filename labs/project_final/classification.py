@@ -351,13 +351,14 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--data_root', default='/home/zongyuez/data/Mask')
     parser.add_argument('--examine', action='store_true')
+    parser.add_argument('--num_workers', default=0, type=int)
 
     args = parser.parse_args()
 
     if not os.path.isdir('checkpoints/'):
         os.mkdir('checkpoints/')
 
-    num_workers = 0
+    num_workers = args.num_workers
 
     params = ParamsClassification(B=args.batch, lr=args.lr, verbose=args.verbose,
                                   device='cuda:' + args.gpu_id, flip=args.flip,

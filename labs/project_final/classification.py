@@ -354,6 +354,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if not os.path.isdir('checkpoints/'):
+        os.mkdir('checkpoints/')
+
     num_workers = 4
     data_root = args.data_root
     image_root = os.path.join(data_root, 'images')

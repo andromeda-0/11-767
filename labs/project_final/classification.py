@@ -320,7 +320,7 @@ class Learning(ABC):
 
             end_time = timer()
 
-            time_per_iter = (end_time - start_time) // i // self.params.B
+            time_per_iter = (end_time - start_time) / i / self.params.B * 1000
 
             loss_item = total_loss.item() / (i + 1)
             accuracy_item = total_acc.item() / (i + 1) / self.params.B
@@ -329,10 +329,10 @@ class Learning(ABC):
                 self.writer.add_scalar('Loss/' + mode, loss_item, epoch)
                 self.writer.add_scalar('Accuracy/' + mode, accuracy_item, epoch)
                 self.writer.add_scalar('mIoU/' + mode, iou_item, epoch)
-                self.writer.add_scalar('Latency/' + mode, time_per_iter, epoch)
+                self.writer.add_scalar('Latency [ms]/' + mode, time_per_iter, epoch)
             print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
                   'Accuracy: ', "%.5f" % accuracy_item, 'IoU: ', "%.5f" % iou_item,
-                  'Latency: ', "%.5f" % time_per_iter)
+                  'Latency: ', "%.5f [ms]" % time_per_iter)
 
 
 if __name__ == '__main__':

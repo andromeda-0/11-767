@@ -12,6 +12,8 @@ import torchvision
 from typing import Sequence
 from abc import ABC, abstractmethod
 from tqdm import tqdm
+from torchmetrics.functional import iou
+from timeit import default_timer as timer
 
 try:
     from matplotlib import pyplot as plt
@@ -290,16 +292,22 @@ class Learning(ABC):
         self._validate(self.init_epoch, mode='Test')
 
     def _validate(self, epoch, mode='Validation'):
-
-        loader = self.valid_loader if mode == 'Validation' else self.test_loader
-
-        if loader is None:
-            self._load_valid()
+        if mode == 'Validation':
+            if self.valid_loader is None:
+                self._load_valid()
+            loader = self.valid_loader
+        else:
+            if self.test_loader is None:
+                self._load_test()
+            loader = self.test_loader
 
         with torch.no_grad():
+            start_time = timer()
+
             self.model.eval()
             total_loss = torch.zeros(1, device=self.device)
             total_acc = torch.zeros(1, device=self.device)
+
             for i, batch in enumerate(loader):
                 bx = batch[0].to(self.device)
                 by = batch[1].to(self.device)
@@ -310,18 +318,26 @@ class Learning(ABC):
                 y_prime = torch.argmax(prediction, dim=1)
                 total_acc += torch.count_nonzero(torch.eq(y_prime, by))
 
+            end_time = timer()
+
+            time_per_iter = (end_time - start_time) // i // self.params.B
+
             loss_item = total_loss.item() / (i + 1)
             accuracy_item = total_acc.item() / (i + 1) / self.params.B
+            iou_item = iou(prediction, by, num_classes=self.params.output_channels)
             if self.writer is not None:
                 self.writer.add_scalar('Loss/' + mode, loss_item, epoch)
                 self.writer.add_scalar('Accuracy/' + mode, accuracy_item, epoch)
+                self.writer.add_scalar('mIoU/' + mode, iou_item, epoch)
+                self.writer.add_scalar('Latency/' + mode, time_per_iter, epoch)
             print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
-                  'Accuracy: ', "%.5f" % accuracy_item)
+                  'Accuracy: ', "%.5f" % accuracy_item, 'IoU: ', "%.5f" % iou_item,
+                  'Latency: ', "%.5f" % time_per_iter)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', help='Batch Size', default=16, type=int)
+    parser.add_argument('--batch', help='Batch Size', default=1, type=int)
     parser.add_argument('--lr', default=1e-3, type=float)
     parser.add_argument('--gpu_id', help='GPU ID (0/1)', default='0')
     parser.add_argument('--model', default='MobileNetV3Large', help='Model Name')

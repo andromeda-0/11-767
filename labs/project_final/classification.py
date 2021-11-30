@@ -28,7 +28,7 @@ except ImportError:
 class Params(ABC):
     B: int = field(default=4)
     lr: float = field(default=1e-3)
-    max_epoch: int = field(default=101)
+    max_epoch: int = field(default=20)
     is_double: int = field(default=False)
     device: torch.device = field(default=torch.device("cuda:0"))
     input_dims: tuple = field(default=(3, 1024, 1024))
@@ -346,7 +346,7 @@ if __name__ == '__main__':
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--flip', action='store_true')
     parser.add_argument('--normalize', action='store_true')
-    parser.add_argument('--save', default=2, type=int, help='Checkpoint interval')
+    parser.add_argument('--save', default=1, type=int, help='Checkpoint interval')
     parser.add_argument('--load', default='', help='Load Name')
     parser.add_argument('--vis_threshold', default=0.0, type=float)
     parser.add_argument('--verbose', action='store_true')

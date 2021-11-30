@@ -47,7 +47,7 @@ class ParamsClassification(Params):
     def __init__(self, B, lr, device, flip, normalize, verbose,
                  max_epoch=101, data_root='D:/11767/FaceMask'):
 
-        super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
+        super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=2,
                          device=device, input_dims=(3, 480, 640))
 
         self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
@@ -169,17 +169,17 @@ class Learning(ABC):
     def _load_train(self):
         self.train_loader = torch.utils.data.DataLoader(self.train_set,
                                                         batch_size=self.params.B, shuffle=True,
-                                                        pin_memory=False, num_workers=num_workers)
+                                                        pin_memory=True, num_workers=num_workers)
 
     def _load_valid(self):
         self.valid_loader = torch.utils.data.DataLoader(self.valid_set,
                                                         batch_size=self.params.B, shuffle=False,
-                                                        pin_memory=False, num_workers=num_workers)
+                                                        pin_memory=True, num_workers=num_workers)
 
     def _load_test(self):
         self.test_loader = torch.utils.data.DataLoader(self.test_set,
                                                        batch_size=self.params.B, shuffle=False,
-                                                       pin_memory=False, num_workers=num_workers)
+                                                       pin_memory=True, num_workers=num_workers)
 
     def load_model(self, epoch=20, name=None, model=True, optimizer=True, loss=False):
         if name is None:
@@ -357,7 +357,7 @@ if __name__ == '__main__':
     if not os.path.isdir('checkpoints/'):
         os.mkdir('checkpoints/')
 
-    num_workers = 4
+    num_workers = 0
 
     params = ParamsClassification(B=args.batch, lr=args.lr, verbose=args.verbose,
                                   device='cuda:' + args.gpu_id, flip=args.flip,

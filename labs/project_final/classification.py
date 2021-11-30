@@ -273,6 +273,14 @@ class Learning(ABC):
             y_prime = torch.argmax(prediction, dim=1)
             self.plot_image(batch[0][0], y_prime.item(), batch[1].item())
 
+    def export_to_onnx(self):
+        dummy_tensor = torch.randn(size=(self.params.B,) + self.params.input_dims,
+                                   device=self.params.device)
+        torch.onnx.export(self.model, dummy_tensor, str(self) + '.onnx', verbose=True,
+                          input_names=['x'], output_names=['output'],
+                          dynamic_axes={'x': {0: 'batch_size'},
+                                        'output': {0: 'batch_size'}})
+
     def plot_image(self, img_tensor, prediction, ground_truth):
         fig, ax = plt.subplots(1)
         img = img_tensor.cpu().data
@@ -368,6 +376,7 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--data_root', default='/home/zongyuez/data/Mask')
     parser.add_argument('--examine', action='store_true')
+    parser.add_argument('--export', action='store_true')
     parser.add_argument('--num_workers', default=0, type=int)
 
     args = parser.parse_args()
@@ -396,3 +405,6 @@ if __name__ == '__main__':
 
     if args.examine:
         learner.examine()
+
+    if args.export:
+        learner.export_to_onnx()

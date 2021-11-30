@@ -14,6 +14,10 @@ from abc import ABC, abstractmethod
 from tqdm import tqdm
 from timeit import default_timer as timer
 
+CNT_0 = 49
+CNT_1 = 574
+CNT_2 = 77
+
 try:
     from matplotlib import pyplot as plt
     from matplotlib import patches
@@ -165,7 +169,7 @@ class Learning(ABC):
 
         self.writer = SummaryWriter('runs/' + str(self)) if SummaryWriter is not None else None
 
-        self.model = model.cuda(self.device)
+        self.model = model.to(self.device)
         if params.is_double:
             self.model.double()
 
@@ -178,7 +182,9 @@ class Learning(ABC):
             self.optimizer = None
 
         if criterion_handle is not None:
-            self.criterion = criterion_handle().cuda(self.device)
+            self.criterion = criterion_handle(weight=torch.as_tensor([
+                2100 / CNT_0, 2100 / CNT_1, 2100 / CNT_2
+            ])).to(self.device)
         else:
             self.criterion = None
 
@@ -277,9 +283,9 @@ class Learning(ABC):
 
             if self.writer is not None:
                 self.writer.add_scalar('Loss/Train', loss_item, epoch)
-                self.writer.add_scalar('Accuracy/Train', accuracy_item, epoch)
+                self.writer.add_scalar('Overall Accuracy/Train', accuracy_item, epoch)
             print('epoch: ', epoch, 'Training Loss: ', "%.5f" % loss_item,
-                  'Accuracy: ', "%.5f" % accuracy_item)
+                  'Overall Accuracy: ', "%.5f" % accuracy_item)
 
             self._validate(epoch)
             self.model.train()
@@ -321,6 +327,10 @@ class Learning(ABC):
                 self._load_test()
             loader = self.test_loader
 
+        confusion_matrix = np.zeros((self.params.output_channels, self.params.output_channels),
+                                    dtype=int)
+        # row -> gt, col -> pred
+
         with torch.no_grad():
             total_time = 0
 
@@ -340,6 +350,7 @@ class Learning(ABC):
                 total_loss += loss
                 y_prime = torch.argmax(prediction, dim=1)
                 total_acc += torch.count_nonzero(torch.eq(y_prime, by))
+                confusion_matrix[batch[1].item(), y_prime.item()] += 1
 
             total_time /= ((i + 1) * self.params.B)
             total_time *= 1000  # [ms]
@@ -347,13 +358,26 @@ class Learning(ABC):
             loss_item = total_loss.item() / (i + 1)
             accuracy_item = total_acc.item() / (i + 1) / self.params.B
 
+            class_acc = np.zeros(self.params.output_channels)
+            for class_id in range(self.params.output_channels):
+                class_acc[class_id] = confusion_matrix[class_id, class_id] / np.sum(
+                        confusion_matrix[class_id])
+
+            mean_acc = np.mean(class_acc)
+
             if self.writer is not None:
                 self.writer.add_scalar('Loss/' + mode, loss_item, epoch)
                 self.writer.add_scalar('Overall Accuracy/' + mode, accuracy_item, epoch)
                 self.writer.add_scalar('Latency [ms]/' + mode, total_time, epoch)
-                print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
-                      'Overall Accuracy: ', "%.5f" % accuracy_item,
-                      'Latency: ', "%.5f [ms]" % total_time)
+                self.writer.add_scalar('Mean Accuracy/' + mode, mean_acc, epoch)
+                for class_id in range(self.params.output_channels):
+                    self.writer.add_scalar(
+                        'Class Accuracy: ' + self.label_to_class[class_id] + '/' + mode,
+                        class_acc[class_id], epoch)
+            print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
+                  'Overall Accuracy: ', "%.5f" % accuracy_item,
+                  'Latency: ', "%.5f [ms]" % total_time,
+                  'Mean Accuracy: ', '%.5f' % mean_acc)
 
 
 if __name__ == '__main__':

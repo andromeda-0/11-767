@@ -192,10 +192,6 @@ class Learning(ABC):
         self.valid_loader = None
         self.test_loader = None
 
-        self.train_split = list(range(700))
-        self.test_split = list(range(700, 800))
-        self.valid_split = list(range(800, 853))
-
     def __del__(self):
         if self.writer is not None:
             self.writer.flush()

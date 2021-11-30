@@ -114,6 +114,27 @@ class MobileNetV3Large(Model):
         return self.classifier.parameters()
 
 
+class MobileNetV3Small(Model):
+    def __init__(self, params: ParamsClassification):
+        super().__init__(params)
+        self.net = torchvision.models.mobilenet_v3_small(pretrained=True, progress=False).features
+
+        for param in self.net.parameters():
+            param.requires_grad = False
+
+        self.pooling = nn.AdaptiveAvgPool2d(1)
+        self.classifier = nn.Linear(576, params.output_channels)
+
+    def forward(self, x):
+        x = self.net(x)
+        x = self.pooling(x)
+        x = torch.flatten(x, 1)
+        return self.classifier(x)
+
+    def trainable(self):
+        return self.classifier.parameters()
+
+
 class MobileNetV3Large_All(Model):
     def __init__(self, params: ParamsClassification):
         super().__init__(params)

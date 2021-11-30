@@ -287,6 +287,27 @@ class Learning(ABC):
             if epoch % checkpoint_interval == 0:
                 self.save_model(epoch)
 
+    def examine(self):
+        self._load_valid()
+
+        for i, batch in enumerate(self.valid_loader):
+            bx = batch[0].to(self.device)
+            prediction = self.model(bx)
+            y_prime = torch.argmax(prediction, dim=1)
+            self.plot_image(batch[0][0], y_prime.item(), batch[1].item())
+
+    def plot_image(self, img_tensor, prediction, ground_truth):
+        fig, ax = plt.subplots(1)
+        img = img_tensor.cpu().data
+
+        # Display the image
+        ax.imshow(img.permute(1, 2, 0))
+
+        plt.title('Ground Truth: %s, Prediction: % s' % (
+            self.label_to_class[ground_truth], self.label_to_class[prediction]))
+
+        plt.show()
+
     def test(self):
         self._validate(self.init_epoch, mode='Test')
 
@@ -351,6 +372,7 @@ if __name__ == '__main__':
     parser.add_argument('--vis_threshold', default=0.0, type=float)
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--data_root', default='/home/zongyuez/data/Mask')
+    parser.add_argument('--examine', action='store_true')
 
     args = parser.parse_args()
 
@@ -378,3 +400,6 @@ if __name__ == '__main__':
         learner.train(args.save)
     if args.test:
         learner.test()
+
+    if args.examine:
+        learner.examine()

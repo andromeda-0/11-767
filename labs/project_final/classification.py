@@ -205,15 +205,15 @@ class Learning(ABC):
                                                         pin_memory=True, num_workers=num_workers)
 
     def _load_valid(self):
-        self.valid_set = FaceMaskSet(os.path.join(self.params.data_root, 'test'),
-                                    self.params.transforms_test)
+        self.valid_set = FaceMaskSet(os.path.join(self.params.data_root, 'valid'),
+                                     self.params.transforms_test)
         self.valid_loader = torch.utils.data.DataLoader(self.valid_set,
                                                         batch_size=self.params.B, shuffle=False,
                                                         pin_memory=True, num_workers=num_workers)
 
     def _load_test(self):
-        self.test_set = FaceMaskSet(os.path.join(self.params.data_root, 'valid'),
-                                     self.params.transforms_test)
+        self.test_set = FaceMaskSet(os.path.join(self.params.data_root, 'test'),
+                                    self.params.transforms_test)
         self.test_loader = torch.utils.data.DataLoader(self.test_set,
                                                        batch_size=self.params.B, shuffle=False,
                                                        pin_memory=True, num_workers=num_workers)

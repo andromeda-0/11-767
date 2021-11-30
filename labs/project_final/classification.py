@@ -339,7 +339,7 @@ class Learning(ABC):
             total_loss = torch.zeros(1, device=self.device)
             total_acc = torch.zeros(1, device=self.device)
 
-            for i, batch in enumerate(loader):
+            for i, batch in enumerate(tqdm(loader)):
                 start_time = timer()
                 bx = batch[0].to(self.device)
                 by = batch[1].to(self.device)

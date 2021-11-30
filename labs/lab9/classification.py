@@ -6,12 +6,17 @@ import torch.nn as nn
 from dataclasses import dataclass, field
 import os
 from torch.utils.data.dataset import T_co
+from PIL import Image
+from torch.utils.data import Dataset
 import torchvision
+from typing import Sequence
 from abc import ABC, abstractmethod
-
-from torchvision.datasets import ImageFolder
 from tqdm import tqdm
 from timeit import default_timer as timer
+
+CNT_0 = 49
+CNT_1 = 574
+CNT_2 = 77
 
 try:
     from matplotlib import pyplot as plt
@@ -31,28 +36,67 @@ class Params(ABC):
     is_double: int = field(default=False)
     device: torch.device = field(default=torch.device("cuda:0"))
     input_dims: tuple = field(default=(3, 1024, 1024))
-    output_channels: int = field(default=2)
+    output_channels: int = field(default=3)
 
     @abstractmethod
     def __str__(self):
         return ''
 
 
-class FaceMaskSet(ImageFolder):
-    def __init__(self, image_root, transforms):
-        super(FaceMaskSet, self).__init__(root=image_root, transform=transforms)
+class ClassificationSet(Dataset):
+    def __getitem__(self, index) -> T_co:
+        """
+        Image, Label
+        """
+        image_path = 'maksssksksss' + str(index) + '.png'
+        image = Image.open(os.path.join(self.image_root, image_path)).convert('RGB')
+        label = self.labels[index]
+
+        return image, label
+
+    def __len__(self):
+        return self.size
+
+    def __init__(self, image_root):
+        self.image_root = image_root
+        self.size = len(os.listdir(image_root))
+        self.labels = np.load(label_root)
+
+
+class Subset(Dataset[T_co]):
+    r"""
+    Subset of a dataset at specified indices.
+
+    Args:
+        dataset (Dataset): The whole Dataset
+        indices (sequence): Indices in the whole set selected for subset
+    """
+    dataset: Dataset[T_co]
+    indices: Sequence[int]
+
+    def __init__(self, dataset: Dataset[T_co], indices: Sequence[int], transforms) -> None:
+        self.transforms = transforms
+        self.dataset = dataset
+        self.indices = indices
+
+    def __getitem__(self, idx):
+        item = self.dataset[self.indices[idx]]
+        return self.transforms(item[0]), item[1]
+
+    def __len__(self):
+        return len(self.indices)
 
 
 class ParamsClassification(Params):
-    def __init__(self, B, lr, device, flip, normalize, verbose,
-                 max_epoch=101, data_root='D:/11767/FaceMask'):
+    def __init__(self, B, lr, device, flip, normalize, vis_threshold, verbose,
+                 max_epoch=101):
 
         super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
                          device=device, input_dims=(3, 480, 640))
 
+        self.vis_threshold = vis_threshold
         self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
         self.verbose = verbose
-        self.data_root = data_root
 
         transforms_train = []
         transforms_test = []
@@ -138,21 +182,20 @@ class Learning(ABC):
             self.optimizer = None
 
         if criterion_handle is not None:
-            self.criterion = criterion_handle().to(self.device)
+            self.criterion = criterion_handle(weight=torch.as_tensor([
+                2100 / CNT_0, 2100 / CNT_1, 2100 / CNT_2
+            ])).to(self.device)
         else:
             self.criterion = None
 
         self.init_epoch = 0
 
-        self.train_set = FaceMaskSet(os.path.join(self.params.data_root, 'train'),
-                                     self.params.transforms_train)
-        self.valid_set = FaceMaskSet(os.path.join(self.params.data_root, 'valid'),
-                                     self.params.transforms_test)
-        self.test_set = FaceMaskSet(os.path.join(self.params.data_root, 'test'),
-                                    self.params.transforms_test)
+        self.dataset = ClassificationSet(image_root)
         self.train_loader = None
         self.valid_loader = None
         self.test_loader = None
+
+        self.label_to_class = {0: 'without_mask', 1: 'with_mask', 2: 'mask_weared_incorrect'}
 
         self.train_split = list(range(700))
         self.test_split = list(range(700, 800))
@@ -167,19 +210,22 @@ class Learning(ABC):
         return self.str
 
     def _load_train(self):
-        self.train_loader = torch.utils.data.DataLoader(self.train_set,
+        train_set = Subset(self.dataset, self.train_split, transforms=self.params.transforms_train)
+        self.train_loader = torch.utils.data.DataLoader(train_set,
                                                         batch_size=self.params.B, shuffle=True,
-                                                        pin_memory=False, num_workers=num_workers)
+                                                        pin_memory=True, num_workers=num_workers)
 
     def _load_valid(self):
-        self.valid_loader = torch.utils.data.DataLoader(self.valid_set,
+        valid_set = Subset(self.dataset, self.valid_split, transforms=self.params.transforms_test)
+        self.valid_loader = torch.utils.data.DataLoader(valid_set,
                                                         batch_size=self.params.B, shuffle=False,
-                                                        pin_memory=False, num_workers=num_workers)
+                                                        pin_memory=True, num_workers=num_workers)
 
     def _load_test(self):
-        self.test_loader = torch.utils.data.DataLoader(self.test_set,
+        test_set = Subset(self.dataset, self.test_split, transforms=self.params.transforms_test)
+        self.test_loader = torch.utils.data.DataLoader(test_set,
                                                        batch_size=self.params.B, shuffle=False,
-                                                       pin_memory=False, num_workers=num_workers)
+                                                       pin_memory=True, num_workers=num_workers)
 
     def load_model(self, epoch=20, name=None, model=True, optimizer=True, loss=False):
         if name is None:
@@ -264,7 +310,7 @@ class Learning(ABC):
         ax.imshow(img.permute(1, 2, 0))
 
         plt.title('Ground Truth: %s, Prediction: % s' % (
-            self.train_set.classes[ground_truth], self.train_set.classes[prediction]))
+            self.label_to_class[ground_truth], self.label_to_class[prediction]))
 
         plt.show()
 
@@ -304,8 +350,7 @@ class Learning(ABC):
                 total_loss += loss
                 y_prime = torch.argmax(prediction, dim=1)
                 total_acc += torch.count_nonzero(torch.eq(y_prime, by))
-                for g, p in zip(batch[1], y_prime):
-                    confusion_matrix[g.item(), p.item()] += 1
+                confusion_matrix[batch[1].item(), y_prime.item()] += 1
 
             total_time /= ((i + 1) * self.params.B)
             total_time *= 1000  # [ms]
@@ -327,8 +372,8 @@ class Learning(ABC):
                 self.writer.add_scalar('Mean Accuracy/' + mode, mean_acc, epoch)
                 for class_id in range(self.params.output_channels):
                     self.writer.add_scalar(
-                            'Class Accuracy: ' + self.valid_set.classes[class_id] + '/' + mode,
-                            class_acc[class_id], epoch)
+                        'Class Accuracy: ' + self.label_to_class[class_id] + '/' + mode,
+                        class_acc[class_id], epoch)
             print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
                   'Overall Accuracy: ', "%.5f" % accuracy_item,
                   'Latency: ', "%.5f [ms]" % total_time,
@@ -337,7 +382,7 @@ class Learning(ABC):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch', help='Batch Size', default=32, type=int)
+    parser.add_argument('--batch', help='Batch Size', default=1, type=int)
     parser.add_argument('--lr', default=1e-3, type=float)
     parser.add_argument('--gpu_id', help='GPU ID (0/1)', default='0')
     parser.add_argument('--model', default='MobileNetV3Large', help='Model Name')
@@ -348,21 +393,25 @@ if __name__ == '__main__':
     parser.add_argument('--normalize', action='store_true')
     parser.add_argument('--save', default=1, type=int, help='Checkpoint interval')
     parser.add_argument('--load', default='', help='Load Name')
+    parser.add_argument('--vis_threshold', default=0.0, type=float)
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--data_root', default='/home/zongyuez/data/Mask')
     parser.add_argument('--examine', action='store_true')
 
     args = parser.parse_args()
 
-    if not os.path.isdir('checkpoints/'):
-        os.mkdir('checkpoints/')
+    if not os.path.isdir('../project_final/checkpoints/'):
+        os.mkdir('../project_final/checkpoints/')
 
     num_workers = 4
+    data_root = args.data_root
+    image_root = os.path.join(data_root, 'images')
+    metadata_root = os.path.join(data_root, 'annotations')
+    label_root = os.path.join(data_root, 'classification_labels.npy')
 
     params = ParamsClassification(B=args.batch, lr=args.lr, verbose=args.verbose,
                                   device='cuda:' + args.gpu_id, flip=args.flip,
-                                  normalize=args.normalize,
-                                  data_root=args.data_root)
+                                  normalize=args.normalize, vis_threshold=args.vis_threshold)
     model = eval(args.model + '(params)')
     learner = Learning(params, model)
     if args.epoch >= 0:

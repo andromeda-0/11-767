@@ -386,7 +386,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch', help='Batch Size', default=32, type=int)
     parser.add_argument('--lr', default=1e-3, type=float)
-    parser.add_argument('--gpu_id', help='GPU ID (0/1)', default='0')
+    parser.add_argument('--gpu_id', help='GPU ID (0/1)', default=0, type=int)
     parser.add_argument('--model', default='MobileNetV3Large', help='Model Name')
     parser.add_argument('--epoch', default=-1, help='Load Epoch', type=int)
     parser.add_argument('--train', action='store_true')
@@ -407,9 +407,10 @@ if __name__ == '__main__':
         os.mkdir('checkpoints/')
 
     num_workers = args.num_workers
+    device = 'cuda:' + str(args.gpu_id) if args.gpu_id >= 0 else 'cpu'
 
     params = ParamsClassification(B=args.batch, lr=args.lr, verbose=args.verbose,
-                                  device='cuda:' + args.gpu_id, flip=args.flip,
+                                  device=device, flip=args.flip,
                                   normalize=args.normalize,
                                   data_root=args.data_root)
     model = eval(args.model + '(params)')

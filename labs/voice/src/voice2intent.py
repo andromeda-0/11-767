@@ -1,14 +1,3 @@
-#
-# Copyright 2018-2021 Picovoice Inc.
-#
-# You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
-# file accompanying this source.
-#
-# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
-# an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
-# specific language governing permissions and limitations under the License.
-#
-
 import argparse
 import os
 from threading import Thread
@@ -17,6 +6,14 @@ import numpy as np
 import pvrhino
 import soundfile
 from pvrecorder import PvRecorder
+
+
+def mask_detection_handler():
+    print("calling mask detection handler")
+
+
+def greeting_handler():
+    print("calling greeting handler")
 
 
 class RhinoDemo(Thread):
@@ -85,13 +82,10 @@ class RhinoDemo(Thread):
                 if is_finalized:
                     inference = rhino.get_inference()
                     if inference.is_understood:
-                        print('{')
-                        print("  intent : '%s'" % inference.intent)
-                        print('  slots : {')
-                        for slot, value in inference.slots.items():
-                            print("    %s : '%s'" % (slot, value))
-                        print('  }')
-                        print('}\n')
+                        if inference.intent == 'maskDetection':
+                            mask_detection_handler()
+                        elif inference.intent == 'greeting':
+                            greeting_handler()
                     else:
                         print("Didn't understand the command.\n")
 
@@ -156,4 +150,5 @@ def main():
 
 
 if __name__ == '__main__':
+    # python3 src/voice2intent.py  --context_path models/voice2intent/maskDetection_en_mac_2021-12-18-utc_v1_6_0.rhn
     main()

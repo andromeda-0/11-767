@@ -182,12 +182,9 @@ class Learning(ABC):
 
         self.init_epoch = 0
 
-        self.train_set = FaceMaskSet(os.path.join(self.params.data_root, 'train'),
-                                     self.params.transforms_train)
-        self.valid_set = FaceMaskSet(os.path.join(self.params.data_root, 'valid'),
-                                     self.params.transforms_test)
-        self.test_set = FaceMaskSet(os.path.join(self.params.data_root, 'test'),
-                                    self.params.transforms_test)
+        self.train_set = None
+        self.valid_set = None
+        self.test_set = None
         self.train_loader = None
         self.valid_loader = None
         self.test_loader = None
@@ -201,16 +198,22 @@ class Learning(ABC):
         return self.str
 
     def _load_train(self):
+        self.train_set = FaceMaskSet(os.path.join(self.params.data_root, 'train'),
+                                     self.params.transforms_train)
         self.train_loader = torch.utils.data.DataLoader(self.train_set,
                                                         batch_size=self.params.B, shuffle=True,
                                                         pin_memory=True, num_workers=num_workers)
 
     def _load_valid(self):
+        self.test_set = FaceMaskSet(os.path.join(self.params.data_root, 'test'),
+                                    self.params.transforms_test)
         self.valid_loader = torch.utils.data.DataLoader(self.valid_set,
                                                         batch_size=self.params.B, shuffle=False,
                                                         pin_memory=True, num_workers=num_workers)
 
     def _load_test(self):
+        self.valid_set = FaceMaskSet(os.path.join(self.params.data_root, 'valid'),
+                                     self.params.transforms_test)
         self.test_loader = torch.utils.data.DataLoader(self.test_set,
                                                        batch_size=self.params.B, shuffle=False,
                                                        pin_memory=True, num_workers=num_workers)
@@ -318,10 +321,12 @@ class Learning(ABC):
             if self.valid_loader is None:
                 self._load_valid()
             loader = self.valid_loader
+            classes = self.valid_set.classes
         else:
             if self.test_loader is None:
                 self._load_test()
             loader = self.test_loader
+            classes = self.test_set.classes
 
         confusion_matrix = np.zeros((self.params.output_channels, self.params.output_channels),
                                     dtype=int)
@@ -369,7 +374,7 @@ class Learning(ABC):
                 self.writer.add_scalar('Mean Accuracy/' + mode, mean_acc, epoch)
                 for class_id in range(self.params.output_channels):
                     self.writer.add_scalar(
-                            'Class Accuracy: ' + self.valid_set.classes[class_id] + '/' + mode,
+                            'Class Accuracy: ' + classes[class_id] + '/' + mode,
                             class_acc[class_id], epoch)
             print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
                   'Overall Accuracy: ', "%.5f" % accuracy_item,

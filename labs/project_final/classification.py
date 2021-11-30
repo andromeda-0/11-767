@@ -31,7 +31,7 @@ class Params(ABC):
     is_double: int = field(default=False)
     device: torch.device = field(default=torch.device("cuda:0"))
     input_dims: tuple = field(default=(3, 1024, 1024))
-    output_channels: int = field(default=2)
+    output_channels: int = field(default=3)
 
     @abstractmethod
     def __str__(self):
@@ -47,7 +47,7 @@ class ParamsClassification(Params):
     def __init__(self, B, lr, device, flip, normalize, verbose,
                  max_epoch=101, data_root='D:/11767/FaceMask'):
 
-        super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=2,
+        super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
                          device=device, input_dims=(3, 480, 640))
 
         self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'

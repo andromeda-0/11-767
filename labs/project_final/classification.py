@@ -12,7 +12,6 @@ import torchvision
 from typing import Sequence
 from abc import ABC, abstractmethod
 from tqdm import tqdm
-from torchmetrics.functional import iou
 from timeit import default_timer as timer
 
 try:
@@ -302,37 +301,38 @@ class Learning(ABC):
             loader = self.test_loader
 
         with torch.no_grad():
-            start_time = timer()
+            total_time = 0
 
             self.model.eval()
             total_loss = torch.zeros(1, device=self.device)
             total_acc = torch.zeros(1, device=self.device)
 
             for i, batch in enumerate(loader):
+                start_time = timer()
                 bx = batch[0].to(self.device)
                 by = batch[1].to(self.device)
 
                 prediction = self.model(bx)
+
+                total_time += (timer() - start_time)
                 loss = self.criterion(prediction, by)
                 total_loss += loss
                 y_prime = torch.argmax(prediction, dim=1)
                 total_acc += torch.count_nonzero(torch.eq(y_prime, by))
 
-            end_time = timer()
-
-            time_per_iter = (end_time - start_time) / i / self.params.B * 1000
+            total_time /= ((i + 1) * self.params.B)
+            total_time *= 1000  # [ms]
 
             loss_item = total_loss.item() / (i + 1)
             accuracy_item = total_acc.item() / (i + 1) / self.params.B
-            iou_item = iou(prediction, by, num_classes=self.params.output_channels)
+
             if self.writer is not None:
                 self.writer.add_scalar('Loss/' + mode, loss_item, epoch)
-                self.writer.add_scalar('Accuracy/' + mode, accuracy_item, epoch)
-                self.writer.add_scalar('mIoU/' + mode, iou_item, epoch)
-                self.writer.add_scalar('Latency [ms]/' + mode, time_per_iter, epoch)
-            print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
-                  'Accuracy: ', "%.5f" % accuracy_item, 'IoU: ', "%.5f" % iou_item,
-                  'Latency: ', "%.5f [ms]" % time_per_iter)
+                self.writer.add_scalar('Overall Accuracy/' + mode, accuracy_item, epoch)
+                self.writer.add_scalar('Latency [ms]/' + mode, total_time, epoch)
+                print('epoch: ', epoch, mode + ' Loss: ', "%.5f" % loss_item,
+                      'Overall Accuracy: ', "%.5f" % accuracy_item,
+                      'Latency: ', "%.5f [ms]" % total_time)
 
 
 if __name__ == '__main__':

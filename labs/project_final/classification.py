@@ -25,13 +25,13 @@ except ImportError:
 
 @dataclass
 class Params(ABC):
-    B: int = field(default=4)
-    lr: float = field(default=1e-3)
-    max_epoch: int = field(default=20)
+    B: int = field()
+    lr: float = field()
+    max_epoch: int = field()
+    device: torch.device = field()
+    input_dims: tuple = field()
+    output_channels: int = field()
     is_double: int = field(default=False)
-    device: torch.device = field(default=torch.device("cuda:0"))
-    input_dims: tuple = field(default=(3, 1024, 1024))
-    output_channels: int = field(default=3)
 
     @abstractmethod
     def __str__(self):
@@ -44,11 +44,12 @@ class FaceMaskSet(ImageFolder):
 
 
 class ParamsClassification(Params):
-    def __init__(self, B, lr, device, flip, normalize, verbose,
+    def __init__(self, B, lr, device, flip, normalize, verbose, resize,
                  max_epoch=101, data_root='D:/11767/FaceMask'):
 
+        self.size = resize if resize > 0 else 1024
         super().__init__(B=B, lr=lr, max_epoch=max_epoch, output_channels=3,
-                         device=device, input_dims=(3, 480, 640))
+                         device=device, input_dims=(3, self.size, self.size))
 
         self.str = 'class_b=' + str(self.B) + 'lr=' + str(self.lr) + '_'
         self.verbose = verbose
@@ -70,6 +71,11 @@ class ParamsClassification(Params):
                     torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)))
             transforms_train.append(
                     torchvision.transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)))
+
+        if resize > 0:
+            self.str = self.str + 'r' + str(resize)
+            transforms_train.append(torchvision.transforms.Resize(resize))
+            transforms_test.append(torchvision.transforms.Resize(resize))
 
         self.transforms_train = torchvision.transforms.Compose(transforms_train)
         self.transforms_test = torchvision.transforms.Compose(transforms_test)
@@ -410,6 +416,7 @@ if __name__ == '__main__':
     parser.add_argument('--train', action='store_true')
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--flip', action='store_true')
+    parser.add_argument('--resize', default=-1, type=int)
     parser.add_argument('--normalize', action='store_true')
     parser.add_argument('--save', default=1, type=int, help='Checkpoint interval')
     parser.add_argument('--load', default='', help='Load Name')
@@ -430,7 +437,8 @@ if __name__ == '__main__':
     params = ParamsClassification(B=args.batch, lr=args.lr, verbose=args.verbose,
                                   device=device, flip=args.flip,
                                   normalize=args.normalize,
-                                  data_root=args.data_root)
+                                  data_root=args.data_root,
+                                  resize=args.resize)
     model = eval(args.model + '(params)')
     learner = Learning(params, model)
     if args.epoch >= 0:

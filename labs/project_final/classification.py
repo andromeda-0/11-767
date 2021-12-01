@@ -216,7 +216,7 @@ class Learning(ABC):
                                     self.params.transforms_test)
         self.test_loader = torch.utils.data.DataLoader(self.test_set,
                                                        batch_size=self.params.B, shuffle=False,
-                                                       pin_memory=False, num_workers=num_workers)
+                                                       pin_memory=True, num_workers=num_workers)
 
     def load_model(self, epoch=20, name=None, model=True, optimizer=True, loss=False):
         if name is None:

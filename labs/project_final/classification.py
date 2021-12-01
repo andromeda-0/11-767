@@ -369,8 +369,8 @@ class Learning(ABC):
                 by = batch[1].to(self.device)
 
                 prediction = self.model(bx)
-
-                total_time += (timer() - start_time)
+                time_added = (timer() - start_time) if 20 <= i < 120 else 0
+                total_time += time_added
                 loss = self.criterion(prediction, by)
                 total_loss += loss
                 y_prime = torch.argmax(prediction, dim=1)
@@ -378,7 +378,10 @@ class Learning(ABC):
                 for g, p in zip(batch[1], y_prime):
                     confusion_matrix[g.item(), p.item()] += 1
 
-            total_time /= ((i + 1) * self.params.B)
+            if i >= 120:
+                total_time /= (100 * self.params.B)
+            else:
+                total_time /= ((i + 1) * self.params.B)
             total_time *= 1000  # [ms]
 
             loss_item = total_loss.item() / (i + 1)

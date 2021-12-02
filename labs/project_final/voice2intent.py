@@ -6,10 +6,12 @@ import numpy as np
 import pvrhino
 import soundfile
 from pvrecorder import PvRecorder
+from caller_classification import *
 
 
 def mask_detection_handler():
     print("calling mask detection handler")
+    classifier()
 
 
 def greeting_handler():
@@ -23,7 +25,8 @@ class RhinoDemo(Thread):
     debugging.
     """
 
-    def __init__(self, library_path, model_path, context_path, audio_device_index=None, output_path=None):
+    def __init__(self, library_path, model_path, context_path, audio_device_index=None,
+                 output_path=None):
         """
         Constructor.
 
@@ -60,11 +63,12 @@ class RhinoDemo(Thread):
 
         try:
             rhino = pvrhino.create(
-                library_path=self._library_path,
-                model_path=self._model_path,
-                context_path=self._context_path)
+                    library_path=self._library_path,
+                    model_path=self._model_path,
+                    context_path=self._context_path)
 
-            recorder = PvRecorder(device_index=self._audio_device_index, frame_length=rhino.frame_length)
+            recorder = PvRecorder(device_index=self._audio_device_index,
+                                  frame_length=rhino.frame_length)
             recorder.start()
 
             print(f"Using device: {recorder.selected_device}")
@@ -102,10 +106,10 @@ class RhinoDemo(Thread):
             if self._output_path is not None and len(self._recorded_frames) > 0:
                 recorded_audio = np.concatenate(self._recorded_frames, axis=0).astype(np.int16)
                 soundfile.write(
-                    os.path.expanduser(self._output_path),
-                    recorded_audio,
-                    samplerate=rhino.sample_rate,
-                    subtype='PCM_16')
+                        os.path.expanduser(self._output_path),
+                        recorded_audio,
+                        samplerate=rhino.sample_rate,
+                        subtype='PCM_16')
 
     @classmethod
     def show_audio_devices(cls):
@@ -120,20 +124,25 @@ def main():
 
     parser.add_argument('--context_path', help="Absolute path to context file.")
 
-    parser.add_argument('--library_path', help="Absolute path to dynamic library.", default=pvrhino.LIBRARY_PATH)
+    parser.add_argument('--library_path', help="Absolute path to dynamic library.",
+                        default=pvrhino.LIBRARY_PATH)
 
     parser.add_argument(
-        '--model_path',
-        help="Absolute path to the file containing model parameters.",
-        default=pvrhino.MODEL_PATH)
+            '--model_path',
+            help="Absolute path to the file containing model parameters.",
+            default=pvrhino.MODEL_PATH)
 
-    parser.add_argument('--audio_device_index', help='Index of input audio device.', type=int, default=-1)
+    parser.add_argument('--audio_device_index', help='Index of input audio device.', type=int,
+                        default=-1)
 
-    parser.add_argument('--output_path', help='Absolute path to recorded audio for debugging.', default=None)
+    parser.add_argument('--output_path', help='Absolute path to recorded audio for debugging.',
+                        default=None)
 
     parser.add_argument('--show_audio_devices', action='store_true')
 
     args = parser.parse_args()
+
+    classifier = Classify()
 
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()
@@ -142,11 +151,11 @@ def main():
             raise ValueError('Missing path to context file')
 
         RhinoDemo(
-            library_path=args.library_path,
-            model_path=args.model_path,
-            context_path=args.context_path,
-            audio_device_index=args.audio_device_index,
-            output_path=args.output_path).run()
+                library_path=args.library_path,
+                model_path=args.model_path,
+                context_path=args.context_path,
+                audio_device_index=args.audio_device_index,
+                output_path=args.output_path).run()
 
 
 if __name__ == '__main__':

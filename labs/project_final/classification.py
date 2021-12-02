@@ -239,7 +239,7 @@ class Learning(ABC):
         self.test_set = FaceMaskSet(os.path.join(self.params.data_root, 'test'),
                                     self.params.transforms_test)
         self.test_loader = torch.utils.data.DataLoader(self.test_set,
-                                                       batch_size=self.params.B, shuffle=False,
+                                                       batch_size=1, shuffle=False,
                                                        pin_memory=True, num_workers=num_workers)
 
     def load_model(self, epoch=20, name=None, model=True, optimizer=True, loss=False):

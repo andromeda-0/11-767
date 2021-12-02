@@ -11,7 +11,7 @@ from caller_classification import *
 
 def mask_detection_handler():
     print("calling mask detection handler")
-    classifier()
+    classifier_instance()
 
 
 def greeting_handler():
@@ -142,8 +142,6 @@ def main():
 
     args = parser.parse_args()
 
-    classifier = Classify()
-
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()
     else:
@@ -160,4 +158,5 @@ def main():
 
 if __name__ == '__main__':
     # python3 src/voice2intent.py  --context_path models/voice2intent/maskDetection_en_mac_2021-12-18-utc_v1_6_0.rhn
+    classifier_instance = Classify()
     main()

@@ -22,6 +22,8 @@ except ImportError:
     patches = None
     SummaryWriter = None
 
+num_worker = 0
+
 
 @dataclass
 class Params(ABC):

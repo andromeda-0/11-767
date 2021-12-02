@@ -346,11 +346,13 @@ class Learning(ABC):
                 self._load_valid()
             loader = self.valid_loader
             classes = self.valid_set.classes
+            batch_size = self.params.B
         else:
             if self.test_loader is None:
                 self._load_test()
             loader = self.test_loader
             classes = self.test_set.classes
+            batch_size = 1
 
         confusion_matrix = np.zeros((self.params.output_channels, self.params.output_channels),
                                     dtype=int)
@@ -379,13 +381,13 @@ class Learning(ABC):
                     confusion_matrix[g.item(), p.item()] += 1
 
             if i >= 120:
-                total_time /= (100 * self.params.B)
+                total_time /= (100 * batch_size)
             else:
-                total_time /= ((i + 1) * self.params.B)
+                total_time /= ((i + 1) * batch_size)
             total_time *= 1000  # [ms]
 
             loss_item = total_loss.item() / (i + 1)
-            accuracy_item = total_acc.item() / (i + 1) / self.params.B
+            accuracy_item = total_acc.item() / (i + 1) / batch_size
 
             class_acc = np.zeros(self.params.output_channels)
             for class_id in range(self.params.output_channels):

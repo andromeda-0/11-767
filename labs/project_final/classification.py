@@ -371,11 +371,11 @@ class Learning(ABC):
                 by = batch[1].to(self.device)
 
                 prediction = self.model(bx)
+                y_prime = torch.argmax(prediction, dim=1)
                 time_added = (timer() - start_time) if 20 <= i < 120 else 0
                 total_time += time_added
                 loss = self.criterion(prediction, by)
                 total_loss += loss
-                y_prime = torch.argmax(prediction, dim=1)
                 total_acc += torch.count_nonzero(torch.eq(y_prime, by))
                 for g, p in zip(batch[1], y_prime):
                     confusion_matrix[g.item(), p.item()] += 1

@@ -22,7 +22,7 @@ except ImportError:
     patches = None
     SummaryWriter = None
 
-num_worker = 0
+num_workers = 0
 
 
 @dataclass

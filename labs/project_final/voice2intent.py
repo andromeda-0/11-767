@@ -160,6 +160,7 @@ def main():
 if __name__ == '__main__':
     # show audio options:
     # /usr/bin/python3 voice2intent.py --show_audio_device
+    # use "index: 0, device name: PCM2902 Audio Codec Analog Mono" for our project
     # run detection on jetson
     # /usr/bin/python3 voice2intent.py  --context_path checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn --audio_device_index 0
     # --output_path rec.wav

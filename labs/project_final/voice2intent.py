@@ -16,6 +16,7 @@ def mask_detection_handler():
 
 def greeting_handler():
     print("calling greeting handler")
+    classifier_instance()
 
 
 class RhinoDemo(Thread):
@@ -157,6 +158,10 @@ def main():
 
 
 if __name__ == '__main__':
-    # python3 src/voice2intent.py  --context_path models/voice2intent/maskDetection_en_mac_2021-12-18-utc_v1_6_0.rhn
+    # show audio options:
+    # /usr/bin/python3 voice2intent.py --show_audio_device
+    # run detection on jetson
+    # /usr/bin/python3 voice2intent.py  --context_path checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn --audio_device_index 0
+    # --output_path rec.wav
     classifier_instance = Classify()
     main()

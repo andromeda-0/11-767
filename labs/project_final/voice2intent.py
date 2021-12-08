@@ -146,7 +146,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--context_path', help="Absolute path to context file.",
-                        default='checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn')
+                        default='checkpoints/maskDetection_en_jetson_v2_0_0.rhn')
 
     parser.add_argument('--library_path', help="Absolute path to dynamic library.",
                         default=pvrhino.LIBRARY_PATH)

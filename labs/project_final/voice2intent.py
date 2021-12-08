@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 from threading import Thread
 
 import numpy as np
@@ -120,6 +121,27 @@ class RhinoDemo(Thread):
             print(f'index: {i}, device name: {devices[i]}')
 
 
+def suppress_std(func):
+    """
+    Suppress warnings.
+    """
+
+    def wrapper(*args, **kwargs):
+        stderr_tmp = sys.stderr
+        null = open(os.devnull, 'w')
+        sys.stderr = null
+        try:
+            result = func(*args, **kwargs)
+            sys.stderr = stderr_tmp
+            return result
+        except:
+            sys.stderr = stderr_tmp
+            raise
+
+    return wrapper
+
+
+@suppress_std
 def main():
     parser = argparse.ArgumentParser()
 

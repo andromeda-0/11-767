@@ -412,6 +412,26 @@ class Learning(ABC):
                   'Latency: ', "%.5f [ms]" % total_time,
                   'Mean Accuracy: ', '%.5f' % mean_acc)
 
+    def infer_random_image(self):
+        if self.test_loader is None:
+            self._load_test()
+
+        with torch.no_grad():
+            self.model.eval()
+
+            item_index = torch.randint(len(self.test_set), (1,)).item()
+
+            bx, by = self.test_set.__getitem__(item_index)
+            bx = torch.unsqueeze(bx, 0)
+            bx = bx.to(self.device)
+            image_path, _ = self.test_set.samples[item_index]
+
+            prediction = self.model(bx)
+            y_prime = torch.argmax(prediction, dim=1).item()
+
+            print('Image: ', image_path, 'True Label: ', self.test_set.classes[by],
+                  'Predicted Label: ', self.test_set.classes[y_prime])
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -432,6 +452,7 @@ if __name__ == '__main__':
     parser.add_argument('--examine', action='store_true')
     parser.add_argument('--export', action='store_true')
     parser.add_argument('--num_workers', default=0, type=int)
+    parser.add_argument('--infer', action='store_true')
 
     args = parser.parse_args()
 
@@ -464,3 +485,6 @@ if __name__ == '__main__':
 
     if args.export:
         learner.export_to_onnx()
+
+    if args.infer:
+        learner.infer_random_image()

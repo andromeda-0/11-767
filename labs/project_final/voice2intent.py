@@ -123,7 +123,8 @@ class RhinoDemo(Thread):
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--context_path', help="Absolute path to context file.")
+    parser.add_argument('--context_path', help="Absolute path to context file.",
+                        default='checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn')
 
     parser.add_argument('--library_path', help="Absolute path to dynamic library.",
                         default=pvrhino.LIBRARY_PATH)
@@ -134,7 +135,7 @@ def main():
             default=pvrhino.MODEL_PATH)
 
     parser.add_argument('--audio_device_index', help='Index of input audio device.', type=int,
-                        default=-1)
+                        default=0)
 
     parser.add_argument('--output_path', help='Absolute path to recorded audio for debugging.',
                         default=None)

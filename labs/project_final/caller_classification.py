@@ -5,7 +5,7 @@ class Classify:
     def __init__(self):
         print('Start Loading')
         params = ParamsClassification(B=64, lr=1e-3, verbose=False,
-                                      device='cuda:0', flip=False,
+                                      device='cpu', flip=False,
                                       normalize=False,
                                       data_root='/home/zongyuez/data/FaceMask',
                                       resize=224)
@@ -15,7 +15,7 @@ class Classify:
         print('Loading Complete')
 
     def __call__(self):
-        self.learner.test()
+        self.learner.infer_random_image()
 
 
 if __name__ == '__main__':

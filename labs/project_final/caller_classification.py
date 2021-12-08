@@ -12,6 +12,7 @@ class Classify:
         model = MobileNetV3Small_All(params)
         self.learner = Learning(params, model)
         self.learner.load_model(epoch=2)
+        self.learner._load_test()
         print('Loading Complete')
 
     def __call__(self):

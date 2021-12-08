@@ -11,40 +11,14 @@ from pvrecorder import PvRecorder
 from caller_classification import *
 
 
-#
-#
-# def suppress_std(func):
-#     """
-#     Suppress warnings.
-#     """
-#
-#     def wrapper(*args, **kwargs):
-#         stderr_tmp = sys.stderr
-#         stdout_tmp = sys.stdout
-#         null = open(os.devnull, 'w')
-#         sys.stderr = null
-#         sys.stdout = null
-#         try:
-#             result = func(*args, **kwargs)
-#             sys.stderr = stderr_tmp
-#             sys.stdout = stdout_tmp
-#             return result
-#         except:
-#             sys.stderr = stderr_tmp
-#             sys.stdout = stdout_tmp
-#             raise
-#
-#     return wrapper
-#
-
 def mask_detection_handler():
-    print("calling mask detection handler", file=sys.stderr)
+    print("calling mask detection handler")
     classifier_instance()
 
 
 def greeting_handler():
     print("calling greeting handler")
-    classifier_instance()
+    # classifier_instance()
 
 
 class RhinoDemo(Thread):
@@ -120,7 +94,7 @@ class RhinoDemo(Thread):
                         elif inference.intent == 'greeting':
                             greeting_handler()
                     else:
-                        print("Didn't understand the command.\n", file=sys.stderr)
+                        print("Didn't understand the command.\n")
 
         except KeyboardInterrupt:
             print('Stopping ...')
@@ -148,6 +122,7 @@ class RhinoDemo(Thread):
             print(f'index: {i}, device name: {devices[i]}')
 
 
+# @suppress_std
 def main():
     parser = argparse.ArgumentParser()
 
@@ -186,31 +161,6 @@ def main():
                 output_path=args.output_path).run()
 
 
-#
-# class Filter(object):
-#     def __init__(self, stream, re_pattern):
-#         self.stream = stream
-#         self.pattern = re.compile(re_pattern) if isinstance(re_pattern, str) else re_pattern
-#         self.triggered = False
-#
-#     def __getattr__(self, attr_name):
-#         return getattr(self.stream, attr_name)
-#
-#     def write(self, data):
-#         if data == '\n' and self.triggered:
-#             self.triggered = False
-#         else:
-#             if self.pattern.search(data) is None:
-#                 self.stream.write(data)
-#                 self.stream.flush()
-#             else:
-#                 # caught bad pattern
-#                 self.triggered = True
-#
-#     def flush(self):
-#         self.stream.flush()
-#
-
 if __name__ == '__main__':
     # show audio options:
     # /usr/bin/python3 voice2intent.py --show_audio_device
@@ -218,11 +168,5 @@ if __name__ == '__main__':
     # run detection on jetson
     # /usr/bin/python3 voice2intent.py  --context_path checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn --audio_device_index 0
     # --output_path rec.wav
-    # stdout_tmp = sys.stdout
-    # stderr_tmp = sys.stderr
-    # sys.stdout = Filter(sys.stdout, r'Overflow')
-    # sys.stderr = Filter(sys.stderr, r'Overflow')
     classifier_instance = Classify()
     main()
-    # sys.stdout = stdout_tmp
-    # sys.stderr = stderr_tmp

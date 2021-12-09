@@ -7,8 +7,8 @@ class Classify:
         params = ParamsClassification(B=64, lr=1e-3, verbose=False,
                                       device='cpu', flip=False,
                                       normalize=False,
-                                      data_root='/home/zongyuez/data/FaceMask',
-                                      resize=224)
+                                      data_root='/home/zongyuez/data/In-the-wild-224',
+                                      resize=-1)
         model = MobileNetV3Small_All(params)
         self.learner = Learning(params, model)
         self.learner.load_model(epoch=2)

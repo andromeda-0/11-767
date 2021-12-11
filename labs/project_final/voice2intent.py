@@ -13,9 +13,7 @@ from caller_classification import *
 
 def mask_detection_handler():
     print("calling mask detection handler")
-    t0 = timer()
     classifier_instance()
-    print('Time used: %.2f ms' % (timer() - t0) * 1000)
 
 
 def greeting_handler():
@@ -152,11 +150,19 @@ if __name__ == '__main__':
 
     parser.add_argument('--show_audio_devices', action='store_true')
 
-    parser.add_argument('--vision_device', type=int)
+    parser.add_argument('--vision_device', default='cpu')
+    parser.add_argument('--vision_weights_name',
+                        default='MobileNetV3Small_All_class_b=64lr=0.001_r32')
+    parser.add_argument('--vision_model_name', default='MobileNetV3Small_All')
+    parser.add_argument('--resize', type=int, default=-1)
+    parser.add_argument('--epoch', type=int, default=8)
+    parser.add_argument('--image_root', default='/home/zongyuez/data/FaceMask_32')
 
     args = parser.parse_args()
 
-    classifier_instance = Classify(device=args.vision_device)
+    classifier_instance = Classify(device=args.vision_device, name=args.vision_weights_name,
+                                   model_name=args.vision_model_name, resize=args.resize,
+                                   epoch=args.epoch, data_root=args.image_root)
 
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()

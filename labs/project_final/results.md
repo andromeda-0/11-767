@@ -62,38 +62,65 @@ epoch:  8 Test Loss:  0.00216 Overall Accuracy:  1.00000 Latency:  140.86811 [ms
 
 Overall Latency - Vision:
 
+- GPU, Larger Model, 1024x1024
 ```bash
 /usr/bin/python3 caller_classification.py --vision_device cuda:0 --vision_weights_name MobileNetV3Large_All_class_b=16lr=0.001_ --vision_model_name MobileNetV3Large_All --image_root /home/zongyuez/data/FaceMask
-Image:  /home/zongyuez/data/FaceMask/test/CMFD/60084_Mask.jpg True Label:  CMFD Predicted Label:  CMFD
-Time Used: 51491.17
+Image:  /home/zongyuez/data/FaceMask/test/NMFD/60086.png True Label:  NMFD Predicted Label:  NMFD
+Time Used: 67468.7
 ```
 
+- GPU, Simplified Model, 1024x1024
 ```bash
 /usr/bin/python3 caller_classification.py --vision_device cuda:0 --vision_weights_name MobileNetV3Small_All_class_b=16lr=0.001_ --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask --epoch 6
-Image:  /home/zongyuez/data/FaceMask/test/NMFD/60032.png True Label:  NMFD Predicted Label:  NMFD
-Time Used: 53563.92
+Image:  /home/zongyuez/data/FaceMask/test/NMFD/60095.png True Label:  NMFD Predicted Label:  NMFD
+Time Used: 55251.6
 ```
 
+- GPU, Simplified Model, 224X224, Offline
 ```bash
 /usr/bin/python3 caller_classification.py --vision_device cuda:0 --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r224 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask_224 --epoch 2
-Image:  /home/zongyuez/data/FaceMask_224/test/CMFD/60007_Mask.jpg True Label:  CMFD Predicted Label:  NMFD
-Time Used: 52775.88
+Image:  /home/zongyuez/data/FaceMask_224/test/NMFD/60007.png True Label:  NMFD Predicted Label:  NMFD
+Time Used: 55917.1
 ```
 
+- GPU, Simplified Model, 32x32, Offline
 ```bash
 /usr/bin/python3 caller_classification.py --vision_device cuda:0 --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r32 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask_32 --epoch 8
-Image:  /home/zongyuez/data/FaceMask_32/test/CMFD/60028_Mask.jpg True Label:  CMFD Predicted Label:  NMFD
-Time Used: 50349.83
+Image:  /home/zongyuez/data/FaceMask_32/test/NMFD/60046.png True Label:  NMFD Predicted Label:  NMFD
+Time Used: 51255.7
 ```
 
+- GPU, Simplified Model, 224X224, Online
 ```bash
-/usr/bin/python3 caller_classification.py --vision_device cpu --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r224 --resize 224 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask --epoch 2
-Image:  /home/zongyuez/data/FaceMask/test/NMFD/60009.png True Label:  NMFD Predicted Label:  NMFD
-Time Used: 3730.44
+/usr/bin/python3 caller_classification.py --vision_device cuda:0 --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r224 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask --epoch 2 --resize 224
+Image:  /home/zongyuez/data/FaceMask/test/IMFD/60016_Mask_Mouth_Chin.jpg True Label:  IMFD Predicted Label:  IMFD
+Time Used: 50822.3
 ```
 
+- GPU, Simplified Model, 32x32, Online
+```bash
+/usr/bin/python3 caller_classification.py --vision_device cuda:0 --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r32 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask --epoch 8 --resize 32
+Image:  /home/zongyuez/data/FaceMask/test/CMFD/60092_Mask.jpg True Label:  CMFD Predicted Label:  CMFD
+Time Used: 52168.6
+```
+
+- CPU, Simplified Model, 224x224, Online
 ```bash
 /usr/bin/python3 caller_classification.py --vision_device cpu --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r224 --resize 224 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask --epoch 2
-Image:  /home/zongyuez/data/FaceMask/test/NMFD/60001.png True Label:  NMFD Predicted Label:  NMFD
-Time Used: 3801.72
+Image:  /home/zongyuez/data/FaceMask/test/CMFD/60009_Mask.jpg True Label:  CMFD Predicted Label:  CMFD
+Time Used: 2961.7
+```
+
+- CPU, Simplified Model, 32x32, Online
+```bash
+/usr/bin/python3 caller_classification.py --vision_device cpu --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r32 --resize 32 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask --epoch 9
+Image:  /home/zongyuez/data/FaceMask/test/CMFD/60037_Mask.jpg True Label:  CMFD Predicted Label:  CMFD
+Time Used: 268.7
+```
+
+- CPU, Simplified Model, 32x32, Offline
+```bash
+/usr/bin/python3 caller_classification.py --vision_device cpu --vision_weights_name MobileNetV3Small_All_class_b=64lr=0.001_r32 --vision_model_name MobileNetV3Small_All --image_root /home/zongyuez/data/FaceMask_32 --epoch 9
+Image:  /home/zongyuez/data/FaceMask_32/test/CMFD/60042_Mask.jpg True Label:  CMFD Predicted Label:  CMFD
+Time Used: 179.2
 ```

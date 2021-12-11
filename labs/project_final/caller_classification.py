@@ -44,4 +44,4 @@ if __name__ == '__main__':
                                    model_name=args.vision_model_name, resize=args.resize,
                                    epoch=args.epoch, data_root=args.image_root)
 
-    print('Time Used: %.2f' % (mask_detection_caller()))
+    print('Time Used: %.1f' % (mask_detection_caller()))

@@ -124,8 +124,6 @@ class RhinoDemo(Thread):
             print(f'index: {i}, device name: {devices[i]}')
 
 
-
-
 if __name__ == '__main__':
     # show audio options:
     # /usr/bin/python3 voice2intent.py --show_audio_device
@@ -158,7 +156,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    classifier_instance = Classify(args.vision_device)
+    classifier_instance = Classify(device=args.vision_device)
 
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()

@@ -3,14 +3,14 @@ from classification import *
 
 class Classify:
     def __init__(self, device, data_root='/home/zongyuez/data/FaceMask_32', epoch=8,
-                 name='MobileNetV3Small_All_class_b=64lr=0.001_r32', B=64, lr=1e-3, resize=-1,
+                 name='MobileNetV3Small_All_class_b=64lr=0.001_r32', resize=-1,
                  model_name='MobileNetV3Small_All'):
         print('Start Loading')
-        params = ParamsClassification(B=B, lr=lr, verbose=False,
+        params = ParamsClassification(B=1, lr=1e-3, verbose=False,
                                       device=device, flip=False,
                                       normalize=False,
                                       data_root=data_root,
-                                      resize=-resize)
+                                      resize=resize)
         model = eval(model_name + '(params)')
         self.learner = Learning(params, model)
         self.learner.load_model(epoch=epoch, name=name)
@@ -18,9 +18,14 @@ class Classify:
         print('Loading Complete')
 
     def __call__(self):
-        t0 = timer()
         self.learner.infer_random_image()
-        print('Time used: %.2f ms' % (timer() - t0) * 1000)
+
+
+def mask_detection_caller():
+    from timeit import default_timer as timer
+    t0 = timer()
+    classifier_instance()
+    return (timer() - t0) * 1000
 
 
 if __name__ == '__main__':
@@ -39,4 +44,4 @@ if __name__ == '__main__':
                                    model_name=args.vision_model_name, resize=args.resize,
                                    epoch=args.epoch, data_root=args.image_root)
 
-    classifier_instance()
+    print('Time Used: %.2f' % (mask_detection_caller()))

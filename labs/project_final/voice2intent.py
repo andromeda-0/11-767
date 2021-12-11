@@ -13,7 +13,9 @@ from caller_classification import *
 
 def mask_detection_handler():
     print("calling mask detection handler")
+    t0 = timer()
     classifier_instance()
+    print('Time used: %.2f ms' % (timer() - t0) * 1000)
 
 
 def greeting_handler():
@@ -122,8 +124,15 @@ class RhinoDemo(Thread):
             print(f'index: {i}, device name: {devices[i]}')
 
 
-# @suppress_std
-def main():
+
+
+if __name__ == '__main__':
+    # show audio options:
+    # /usr/bin/python3 voice2intent.py --show_audio_device
+    # use "index: 0, device name: PCM2902 Audio Codec Analog Mono" for our project
+    # run detection on jetson
+    # /usr/bin/python3 voice2intent.py  --context_path checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn --audio_device_index 0
+    # --output_path rec.wav
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--context_path', help="Absolute path to context file.",
@@ -145,7 +154,11 @@ def main():
 
     parser.add_argument('--show_audio_devices', action='store_true')
 
+    parser.add_argument('--vision_device', type=int)
+
     args = parser.parse_args()
+
+    classifier_instance = Classify(args.vision_device)
 
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()
@@ -159,14 +172,3 @@ def main():
                 context_path=args.context_path,
                 audio_device_index=args.audio_device_index,
                 output_path=args.output_path).run()
-
-
-if __name__ == '__main__':
-    # show audio options:
-    # /usr/bin/python3 voice2intent.py --show_audio_device
-    # use "index: 0, device name: PCM2902 Audio Codec Analog Mono" for our project
-    # run detection on jetson
-    # /usr/bin/python3 voice2intent.py  --context_path checkpoints/maskDetection_en_jetson_2021-12-18-utc_v1_6_0.rhn --audio_device_index 0
-    # --output_path rec.wav
-    classifier_instance = Classify()
-    main()

@@ -1,3 +1,5 @@
+import time
+
 from classification import *
 from capture_image import *
 import cv2
@@ -68,9 +70,15 @@ if __name__ == '__main__':
                                           model_name=args.vision_model_name, resize=args.resize,
                                           epoch=args.epoch)
 
+    # cam = Cam()
     cam = Cam_Always_On()
-    t_prediction, t_camera, img = mask_detection_caller(cam)
-    print(
-            'Time Used by Prediction: %.1f ms, Time Used by Camera: %.1f ms' % (
-                t_prediction, t_camera))
-    cv2.imwrite('output.png', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+    t_p = 0
+    t_c = 0
+    for _ in range(10):
+        t_prediction, t_camera, img = mask_detection_caller(cam)
+        t_p += t_prediction
+        t_c += t_camera
+        time.sleep(10)
+    print('Time Used by Prediction: %.1f ms, Time Used by Camera: %.1f ms' % (
+        t_p / 10, t_c / 10))
+    # cv2.imwrite('output.png', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))

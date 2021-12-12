@@ -9,11 +9,12 @@ import pvrhino
 import soundfile
 from pvrecorder import PvRecorder
 from caller_classification import *
+from capture_image import Cam
 
 
 def mask_detection_handler():
     print("calling mask detection handler")
-    classifier_instance()
+    classifier_instance(Cam.capture_image())
 
 
 def greeting_handler():
@@ -160,9 +161,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    classifier_instance = Classify(device=args.vision_device, name=args.vision_weights_name,
-                                   model_name=args.vision_model_name, resize=args.resize,
-                                   epoch=args.epoch, data_root=args.image_root)
+    # classifier_instance = Classify(device=args.vision_device, name=args.vision_weights_name,
+    #                                model_name=args.vision_model_name, resize=args.resize,
+    #                                epoch=args.epoch, data_root=args.image_root)
+
+    classifier_instance = Classify_Camera(device=args.vision_device, name=args.vision_weights_name,
+                                          model_name=args.vision_model_name, resize=args.resize,
+                                          epoch=args.epoch, data_root=args.image_root)
 
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()

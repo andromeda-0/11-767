@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 import os
 from torch.utils.data.dataset import T_co
 import torchvision
+import torchvision.transforms.functional
 from abc import ABC, abstractmethod
 
 from torchvision.datasets import ImageFolder
@@ -451,6 +452,20 @@ class Learning(ABC):
 
                 print('Image: ', image_path, 'True Label: ', self.test_set.classes[by],
                       'Predicted Label: ', self.test_set.classes[y_prime])
+
+    def infer_camera_image(self, img):
+        if self.test_loader is None:
+            self._load_test()
+        with torch.no_grad():
+            self.model.eval()
+
+            bx = torchvision.transforms.functional.to_tensor(img)
+            bx = torch.unsqueeze(bx, 0)
+            bx = bx.to(self.device)
+            prediction = self.model(bx)
+            y_prime = torch.argmax(prediction, dim=1).item()
+
+            print('Predicted Label: ', self.test_set.classes[y_prime])
 
 
 if __name__ == '__main__':

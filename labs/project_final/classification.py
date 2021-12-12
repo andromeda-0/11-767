@@ -453,7 +453,7 @@ class Learning(ABC):
                 print('Image: ', image_path, 'True Label: ', self.test_set.classes[by],
                       'Predicted Label: ', self.test_set.classes[y_prime])
 
-    def infer_camera_image(self, img):
+    def infer_camera_image(self, img, normalize=False, resize=-1):
         if self.test_loader is None:
             self._load_test()
         with torch.no_grad():
@@ -462,8 +462,12 @@ class Learning(ABC):
             bx = torchvision.transforms.functional.to_tensor(img)
 
             # normalization is probably needed
-            # bx = torchvision.transforms.functional.normalize(bx, [0.485, 0.456, 0.406],
-            #                                                  [0.229, 0.224, 0.225])
+            if normalize:
+                bx = torchvision.transforms.functional.normalize(bx, [0.485, 0.456, 0.406],
+                                                                 [0.229, 0.224, 0.225])
+            if resize > 0:
+                bx = torchvision.transforms.functional.resize(bx, resize)
+
             bx = torch.unsqueeze(bx, 0)
             bx = bx.to(self.device)
             prediction = self.model(bx)

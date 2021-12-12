@@ -1,5 +1,5 @@
 from classification import *
-from capture_image import Cam
+from capture_image import *
 import cv2
 
 
@@ -43,11 +43,14 @@ class Classify_Camera:
         self.learner.infer_camera_image(img)
 
 
-def mask_detection_caller(img):
+def mask_detection_caller(cam):
     from timeit import default_timer as timer
     t0 = timer()
+    img = cam.capture_image()
+    t1 = timer()
     classifier_instance(img)
-    return (timer() - t0) * 1000, img
+    t2 = timer()
+    return (t2 - t1) * 1000, (t1 - t0) * 1000, img
 
 
 if __name__ == '__main__':
@@ -65,7 +68,9 @@ if __name__ == '__main__':
                                           model_name=args.vision_model_name, resize=args.resize,
                                           epoch=args.epoch)
 
-    cam = Cam()
-    t, img = mask_detection_caller(cam.capture_image())
-    print('Time Used: %.1f ms' % t)
+    cam = Cam_Always_On()
+    t_prediction, t_camera, img = mask_detection_caller(cam)
+    print(
+            'Time Used by Prediction: %.1f ms, Time Used by Camera: %.1f ms' % (
+                t_prediction, t_camera))
     cv2.imwrite('output.png', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))

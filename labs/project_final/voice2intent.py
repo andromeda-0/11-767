@@ -9,12 +9,13 @@ import pvrhino
 import soundfile
 from pvrecorder import PvRecorder
 from caller_classification import *
-from capture_image import Cam
+from capture_image import *
 
 
 def mask_detection_handler():
     print("calling mask detection handler")
-    classifier_instance(Cam.capture_image())
+    # for _ in range(100):
+    classifier_instance(cam.capture_image())
 
 
 def greeting_handler():
@@ -169,6 +170,7 @@ if __name__ == '__main__':
                                           model_name=args.vision_model_name, resize=args.resize,
                                           epoch=args.epoch, data_root=args.image_root)
 
+    cam = Cam_Always_On()
     if args.show_audio_devices:
         RhinoDemo.show_audio_devices()
     else:

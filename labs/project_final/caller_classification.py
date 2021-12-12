@@ -1,5 +1,6 @@
 from classification import *
 from capture_image import Cam
+import cv2
 
 
 class Classify:
@@ -46,7 +47,7 @@ def mask_detection_caller(img):
     from timeit import default_timer as timer
     t0 = timer()
     classifier_instance(img)
-    return (timer() - t0) * 1000
+    return (timer() - t0) * 1000, img
 
 
 if __name__ == '__main__':
@@ -56,13 +57,15 @@ if __name__ == '__main__':
                         default='MobileNetV3Small_All_class_b=64lr=0.001_r32')
     parser.add_argument('--vision_model_name', default='MobileNetV3Small_All')
     parser.add_argument('--resize', type=int, default=-1)
-    parser.add_argument('--epoch', type=int, default=8)
-    parser.add_argument('--image_root', default='/home/zongyuez/data/FaceMask_32')
+    parser.add_argument('--epoch', type=int, default=9)
 
     args = parser.parse_args()
 
     classifier_instance = Classify_Camera(device=args.vision_device, name=args.vision_weights_name,
                                           model_name=args.vision_model_name, resize=args.resize,
-                                          epoch=args.epoch, data_root=args.image_root)
+                                          epoch=args.epoch)
 
-    print('Time Used: %.1f ms' % (mask_detection_caller(Cam.capture_image())))
+    cam = Cam()
+    t, img = mask_detection_caller(cam.capture_image())
+    print('Time Used: %.1f ms' % t)
+    cv2.imwrite('output.png', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))

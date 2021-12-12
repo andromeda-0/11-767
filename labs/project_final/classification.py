@@ -460,6 +460,10 @@ class Learning(ABC):
             self.model.eval()
 
             bx = torchvision.transforms.functional.to_tensor(img)
+
+            # normalization is probably needed
+            # bx = torchvision.transforms.functional.normalize(bx, [0.485, 0.456, 0.406],
+            #                                                  [0.229, 0.224, 0.225])
             bx = torch.unsqueeze(bx, 0)
             bx = bx.to(self.device)
             prediction = self.model(bx)
